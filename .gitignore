@@ -13,7 +13,6 @@
 # firebase
 .firebaserc
 /firebase.json
-/src/config/Firebase.js
 /.firebase
 
 # production
