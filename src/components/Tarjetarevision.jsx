@@ -10,7 +10,7 @@ const Tarjetarevision = ({ menu, handleUpdate, handleDelete }) => {
         const confirmAprove = window.confirm("¿Estás seguro de que deseas aprobar este elemento?");
         if (confirmAprove){
             const updatedValue = currentValue === 1 ? 0 : 1;
-            handleUpdate(id, { aprovado: updatedValue });  
+            handleUpdate(id, { aprovado: updatedValue }); 
         }
     };
     const handleDeleteCard = (id) => {

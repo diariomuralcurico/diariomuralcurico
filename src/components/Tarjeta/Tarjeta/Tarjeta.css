@@ -1,0 +1,72 @@
+
+.btnFilter{
+    background-color: #fdfdfd !important; 
+    border-color: rgb(190, 190, 178) !important;
+    color: rgb(62, 5, 80) !important;
+}
+
+.btnFilter:hover{
+    background-color: #724696 !important;
+    color: rgb(243, 241, 243) !important;
+  }
+
+  
+  .card {
+    border: 1px solid #d5d0d6 !important;
+    border-radius: 1.75rem;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(243, 243, 243, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 10px !important;
+    width: 350px !important;
+  }
+  
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+
+
+  .Cardfiltro {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(60, 4, 82, 0.15);
+    padding: 16px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .fechaTitulo{
+    background-color: transparent !important;
+    border-bottom: none !important;
+  }
+  
+  .tituloCard{
+    color: #343A40  !important;
+
+    /* font-family: 'Code-Cold-Bold-trail','Roboto', sans-serif; */
+  }
+
+  .imgCard{
+    width: 100%;
+    margin-bottom: 15px;
+    height: 400px;
+    object-fit: contain;
+  }
+
+  strong{
+    font-family: 'Code-Cold-Bold-trail','Roboto', sans-serif;
+  }
+
+  /* p{
+    font-family: 'Code-Cold-Light-trail','Roboto', sans-serif;
+
+  } */
+
+  .spinnerTarjeta{
+    min-height: 60vh; /* o lo que prefieras para empujar al footer */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }

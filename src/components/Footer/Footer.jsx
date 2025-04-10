@@ -1,6 +1,5 @@
 import { Col, Row, Container, Button } from "react-bootstrap";
 import logodmcfull from "../../images/lgdmcfull.png";
-import { TbMail } from "react-icons/tb";
 import "./Footer.css";
 
 const Footer = () => {
@@ -49,7 +48,6 @@ const Footer = () => {
               className="d-flex justify-content-center justify-content-sm-end">
               <ul className="m-4 list-unstyled d-flex align-items-center">
                 <li className="mx-2">
-                <TbMail className="iconMail"/>
                   <Button
                     href="mailto:diariomuralcurico@gmail.com"
                     variant="link"
