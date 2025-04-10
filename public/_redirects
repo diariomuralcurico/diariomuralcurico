@@ -1,0 +1,23 @@
+<!-- # Redirige todas las rutas a index.html para SPA -->
+/*    /index.html    200
+
+<!-- # Redirecciones 301 permanentes con comentarios para cada grupo
+# Redirigir URLs antiguas a nuevas rutas (SEO) -->
+<!-- /old-path           /new-path                301 -->
+<!-- /another-old-page   /another-new-page        301 -->
+
+<!-- # Redirecciones para errores 404 personalizados (si tienes una página de error) -->
+<!-- /404                /custom-404-page         404 -->
+
+<!-- # Redirigir sin www (para evitar duplicación de contenido en SEO) -->
+https://www.diariomuralcurico.cl//*    https://diariomuralcurico.cl/:splat    301
+
+<!-- # Redirigir siempre a HTTPS -->
+http://*  https://:splat 301
+
+<!-- # Redirigir rutas de contenido que cambió de idioma o estructura -->
+<!-- /es/blog/como-usar-netlify /es/articulos/netlify-uso 301
+/en/old-path /en/new-path 301 -->
+
+<!-- # Asegura que los parámetros de búsqueda funcionen con un signo de interrogación al final -->
+/* /index.html 200!

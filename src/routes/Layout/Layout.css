@@ -1,0 +1,11 @@
+
+.page-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+.footer{
+    background-color: #0d1b2a  ;
+    display: flex;
+    flex-direction: column;
+}

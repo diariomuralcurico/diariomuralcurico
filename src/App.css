@@ -1,0 +1,20 @@
+.App {
+  text-align: center;
+  margin: 0 !important;
+  padding: 0 !important;
+  /* overflow-x: hidden !important; */
+  width: 100% !important;
+}
+
+/* El contenedor general del layout */
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* El contenido principal crece para empujar el footer abajo */
+.layout-content {
+  flex: 1;
+}
+

@@ -1,0 +1,65 @@
+
+
+.background-image {
+  background-image: url('../../images/bg1.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+  .logoMuralNav{
+    height:  180px !important;
+    width: auto !important; 
+  }
+
+  .logoMuralBlack{
+    height:  200px !important;  
+    width: auto; 
+  }
+
+  .iconsRedes{
+    height: 80px;
+    width: auto;
+  }
+
+  .btnLink{
+    background-color: #fdfdfd !important; 
+    color: rgb(62, 5, 80) !important;
+  }
+
+  .btnLink:hover{
+    background-color: #724696 !important;
+    color: rgb(243, 241, 243) !important;
+
+  }
+
+  .bg-custom {
+    background-color: #f5f2f7 !important; 
+  }
+
+  .btncontainer{
+    display: flex;
+    gap: 10px;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .logoMural {
+    max-width: 100%;
+    height: auto;
+    width: 170px; 
+  }
+
+  
+  @media (max-width: 576px) {
+    .logoMural {
+      width: 220px;
+    }
+  }
