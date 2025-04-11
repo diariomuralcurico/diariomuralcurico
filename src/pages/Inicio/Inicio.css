@@ -1,0 +1,50 @@
+
+
+p{
+    font-family: 'Codec-Pro-Light','Roboto', sans-serif;
+    
+}
+
+h1 {
+    margin-bottom: 10px !important;
+    width: 70% !important;
+    color: tomato;
+  }
+  
+  h1:hover {
+    color: #724696;;
+  }
+
+.carousel-img{
+    height: 450px;
+    object-fit: contain; /* recorta y mantiene proporción */
+    object-position: center;
+}
+
+/* Para pantallas pequeñas: */
+@media (max-width: 768px) {
+    .carousel-img {
+      height: 350px;
+    }
+  }
+  
+  /* Opcional: más compacto aún en móviles muy pequeños */
+  @media (max-width: 480px) {
+    .carousel-img {
+      height: 260px;
+    }
+  }
+
+.imgAsupiciadores{
+    border-radius: 10%;
+}
+
+.imgAsupiciadores:hover{
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 8px 24px #ffffff;
+}
+
+.imgSecciones{
+  height: 260px;
+
+}

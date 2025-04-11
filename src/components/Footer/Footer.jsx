@@ -1,13 +1,9 @@
+
 import { Col, Row, Container, Button } from "react-bootstrap";
 import logodmcfull from "../../images/lgdmcfull.png";
 import "./Footer.css";
 
 const Footer = () => {
-  const handleInstagram = () => {
-    console.log("a");
-    const url = "https://www.instagram.com";
-    window.open(url, "_blank");
-  };
   return (
     <div className="page-container">
       <style type="text/css">
@@ -24,11 +20,10 @@ const Footer = () => {
       <div className="footer d-flex justify-content-center p-4 text-center text-white">
         <Container>
           <Row className="d-flex justify-content-between align-items-center">
-            {/* Columna de la imagen a la izquierda */}
             <Col
               xs={12}
               sm={6}
-              md={6}
+              md={5}
               className="d-flex justify-content-center justify-content-sm-start">
               <a
                 href="https://diariomuralcurico.cl/"
@@ -40,11 +35,10 @@ const Footer = () => {
                 />
               </a>
             </Col>
-            {/* Columna de los botones a la derecha */}
             <Col
               xs={12}
               sm={6}
-              md={6}
+              md={7}
               className="d-flex justify-content-center justify-content-sm-end">
               <ul className="m-4 list-unstyled d-flex align-items-center">
                 <li className="mx-2">
@@ -56,19 +50,21 @@ const Footer = () => {
                   </Button>
                 </li>
                 <li className="mx-2">
-                  <Button
-                    onClick={() => handleInstagram()}
-                    variant="link"
+                  <a
+                    href="https://www.instagram.com/diariomuralcurico/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                      variant="link"
                     style={{ textDecoration: "none", color: "white" }}>
-                    Instagram
-                  </Button>
+                      Instagram
+                  </a>
                 </li>
               </ul>
             </Col>
           </Row>
           <Row>
             <Col>
-              <hr className="block mx-6 mt-10" />
+              <hr className="block mx-4 mt-10" />
               <p className="copiright text-center text-white pt-4 pb-6 px-3 sm:px-7">
                 <small>
                   Diario Mural Curicó © Copyright 2025 - Todos los derechos
