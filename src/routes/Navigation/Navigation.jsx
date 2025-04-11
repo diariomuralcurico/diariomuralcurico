@@ -19,7 +19,7 @@ import "./Navigation.css";
                 <img
                   alt="Logo Diario Mural Curicó"
                   src={logodmcfull}
-                  className="logoMuralNav p-2 ml-1"
+                  className="logoMuralNav mx-auto p-3 "
                 />
               </a>
             </div>
@@ -27,19 +27,19 @@ import "./Navigation.css";
             <Container fluid className="d-flex justify-content-center justify-content-md-end">
               <div className="d-flex align-items-center">
                 <Col xs="auto">
-                  <Navbar expand="sm" className="w-100">
+                  <Navbar expand="lg" className="w-100">
                     <Container fluid>
                       {/* Botones visibles en móvil, ahora debajo del logo */}
-                      <div className="d-flex btncontainer flex-grow-1 pe-3">
+                      <div className="d-flex btncontainer flex-grow-1 pe-2">
                         <Nav.Link
                           href="/programacion"
-                          className="btnLink rounded fw-bold fs-5 m-1 p-2"
+                          className="btnLink rounded fw-bold fs-6 m-1 p-2"
                         >
                           Agenda
                         </Nav.Link>
                         <Nav.Link
                           href="/publicar"
-                          className="btnLink rounded fw-bold fs-5 m-1 p-2"
+                          className="btnLink rounded fw-bold fs-6 m-1 p-2"
                         >
                           Publicar
                         </Nav.Link>
@@ -66,12 +66,12 @@ import "./Navigation.css";
                           <Nav className="btncontainer flex-grow-1">
                             <Nav.Link
                               href="/"
-                              className="btnLink rounded fw-bold fs-5 m-1 p-2">
+                              className="btnLink rounded fw-bold fs-6 m-1 p-2">
                               Inicio
                             </Nav.Link>
                             <Nav.Link
                               href="/quienes-somos"
-                              className="btnLink rounded fw-bold fs-5 m-1 p-2">
+                              className="btnLink rounded fw-bold fs-6 m-1 p-2">
                               Nosotros
                             </Nav.Link>
                           </Nav>

@@ -12,6 +12,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/es";
 import "./Tarjeta.css";
 import { BarLoader } from "react-spinners";
+import CardHeader from "react-bootstrap/esm/CardHeader";
 
 const Tarjeta = ({ menu }) => {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
@@ -144,7 +145,18 @@ const Tarjeta = ({ menu }) => {
                         className="d-flex justify-content-center"
                         key={plato.id}>
                         <Card className="text-center fixed-card shadow-sm ">
-                          <div style={{ marginBottom: "10px" }}></div>
+                                                <CardHeader>
+                                                  <Card.Subtitle>
+                                                    {dayjs(plato.fechaHoraActividad.toDate())
+                                                      .locale("es")
+                                                      .format("dddd D MMM YYYY")
+                                                      .toUpperCase()}{" "}
+                                                    /{" "}
+                                                    {dayjs(plato.fechaHoraActividad.toDate()).format(
+                                                      "H:mm A"
+                                                    )}
+                                                  </Card.Subtitle>
+                                                </CardHeader>
                           <Card.Img
                             loading="lazy"
                             className=" imgCard mb-none "
@@ -156,7 +168,7 @@ const Tarjeta = ({ menu }) => {
                               {plato.nombre.toUpperCase()}
                             </Card.Title>
                             <p>
-                              <strong>Organizador:</strong> {plato.organiza}
+                              <strong>Ubicación:</strong> {plato.direccion}
                             </p>
                             <Button
                               className="btnFilter fw-bold fs-5 mt-2"

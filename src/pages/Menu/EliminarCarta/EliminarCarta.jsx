@@ -3,12 +3,8 @@ import { useState, useEffect } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../config/Firebase";
 
-import Modal from "react-bootstrap/Modal";
-
 import { es } from "date-fns/locale";
 import { format } from "date-fns";
-import logodmcfull2 from "../../../images/lgdmcfull2.png";
-import { Col, Container } from "react-bootstrap";
 
 import "./EliminarCarta.css";
 import EliminarCard from "../../../components/Tarjeta/Eliminar/EliminarCard";
