@@ -16,12 +16,13 @@
   }
 
   .logoMuralBlack{
-    height:  200px !important;  
+    margin-top: 20px;
+    height:  80px !important;  
     width: auto; 
   }
 
   .iconsRedes{
-    height: 80px;
+    height: 53px;
     width: auto;
   }
 

@@ -54,11 +54,12 @@ import "./Navigation.css";
                         aria-labelledby="offcanvasNavbarLabel-expand-sm"
                         placement="end">
                         <Offcanvas.Header closeButton>
-                          <Offcanvas.Title id="offcanvasNavbarLabel-expand-sm">
+                          <Offcanvas.Title id="offcanvasNavbarLabel-expand-sm ">
                             <img
                               alt="Logo"
+                              style={{ textDecoration: "none", color: "white" }}
                               src={logoencabezado}
-                              className="logoMuralBlackCollapse d-inline-block align-top"
+                              className="logoMuralBlack d-inline-block align-top"
                             />
                           </Offcanvas.Title>
                         </Offcanvas.Header>
@@ -75,7 +76,7 @@ import "./Navigation.css";
                               Nosotros
                             </Nav.Link>
                           </Nav>
-                          <Row className="d-flex align-items-center d-sm-none justify-content-center text-center mt-2">
+                          <Row className="d-flex align-items-center d-sm-none justify-content-between align-items-center text-center mt-4">
                             <Col xs="auto">
                               <a
                                 href="https://www.instagram.com/diariomuralcurico"
@@ -84,8 +85,8 @@ import "./Navigation.css";
                                 <img
                                   alt="Instagram"
                                   src={insta}
-                                  height="50"
-                                  className="iconsRedes m-1 d-inline-block align-top"
+                                  height="40"
+                                  className="iconsRedes m-1 d-inline-block align-"
                                 />
                               </a>
                               <a href="mailto:diariomuralcurico@gmail.com">
