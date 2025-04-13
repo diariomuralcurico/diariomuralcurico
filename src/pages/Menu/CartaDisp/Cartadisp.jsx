@@ -7,7 +7,6 @@ import Modal from "react-bootstrap/Modal";
 
 import { es } from "date-fns/locale";
 import { format } from "date-fns";
-import logodmcfull2 from "../../../images/lgdmcfull2.png";
 import { Col, Container } from "react-bootstrap";
 
 import Tarjeta from "../../../components/Tarjeta/Tarjeta/Tarjeta.jsx"
@@ -74,7 +73,7 @@ const Cartadisp = () => {
                   <img
                     className="logoMuralCartaDisp"
                     alt="Logo Diario Mural Curicó"
-                    src={logodmcfull2}
+                    src="/images/lgdmcfull2.png"
                   />
                 </a>
               </Col>

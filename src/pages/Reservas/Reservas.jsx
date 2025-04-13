@@ -222,7 +222,7 @@ const Reservas = () => {
                   <Form.Label htmlFor="disabledSelect">Categoría</Form.Label>
                   <Form.Select onChange={catchInputs} value={user.categoria} required name='categoria' id="disabledSelect">
                     <option>Artes y diseño</option>
-                    <option>Eventos, Festivales y Carrete</option>
+                    <option>Eventos, Festivales y Fiestas</option>
                     <option>Deportes</option>
                     <option>Gastronomía</option>
                     <option>Encuentros, Conferencias, Seminarios, Ferias, Exposiciones</option>

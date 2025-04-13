@@ -1,6 +1,5 @@
 
 import { Col, Row, Container, Button } from "react-bootstrap";
-import logodmcfull from "../../images/lgdmcfull.png";
 import "./Footer.css";
 
 const Footer = () => {
@@ -30,7 +29,7 @@ const Footer = () => {
                 className="d-inline-block">
                 <img
                   alt="Logo Diario Mural Curicó"
-                  src={logodmcfull}
+                  src="/images/lgdmcfull.png"
                   className="logoMuralFooter  "
                 />
               </a>

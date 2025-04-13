@@ -1,9 +1,7 @@
 import {Nav, Navbar, Row, Col, Container } from "react-bootstrap";
 import Offcanvas from "react-bootstrap/Offcanvas";
-import logoencabezado from "../../images/logoencabezado.png";
-import logodmcfull from "../../images/lgdmcfull.png";
-import insta from "../../images/instagram.png";
-import correo from "../../images/correo.png";
+
+
 import "./Navigation.css";
 
 
@@ -18,7 +16,7 @@ import "./Navigation.css";
               <a href="https://diariomuralcurico.cl/" className="d-inline-block">
                 <img
                   alt="Logo Diario Mural Curicó"
-                  src={logodmcfull}
+                  src="/images/lgdmcfull.png"
                   className="logoMuralNav mx-auto p-3 "
                 />
               </a>
@@ -58,7 +56,7 @@ import "./Navigation.css";
                             <img
                               alt="Logo"
                               style={{ textDecoration: "none", color: "white" }}
-                              src={logoencabezado}
+                              src="/images/logoencabezado.png"
                               className="logoMuralBlack d-inline-block align-top"
                             />
                           </Offcanvas.Title>
@@ -84,7 +82,7 @@ import "./Navigation.css";
                                 rel="noopener noreferrer">
                                 <img
                                   alt="Instagram"
-                                  src={insta}
+                                  src="/images/instagram.png"
                                   height="40"
                                   className="iconsRedes m-1 d-inline-block align-"
                                 />
@@ -92,7 +90,7 @@ import "./Navigation.css";
                               <a href="mailto:diariomuralcurico@gmail.com">
                                 <img
                                   alt="Correo"
-                                  src={correo}
+                                  src="/images/correo.png"
                                   height="50"
                                   className="iconsRedes m-1 d-inline-block align-top"
                                 />

@@ -17,21 +17,21 @@ const Inicio = () => {
             <Carousel.Item>
               <img
                 className="carousel-img d-block w-100"
-                src={require("./../../images/afcorpo.png")}
+                src="/images/afcorpo.png"
                 alt="corporacion cultural de curico"
               />
             </Carousel.Item>
             <Carousel.Item>
               <img
                 className="carousel-img d-block w-100"
-                src={require("./../../images/afmaca.jpeg")}
+                src="/images/afmaca.jpeg"
                 alt="terapia gestalt curico"
               />
             </Carousel.Item>
             <Carousel.Item>
               <img
                 className="carousel-img d-block w-100"
-                src={require("./../../images/afnagata.jpeg")}
+                src="/images/afnagata.jpeg"
                 alt="nagata juegos"
               />
             </Carousel.Item>
@@ -44,7 +44,7 @@ const Inicio = () => {
             <Ratio key={"1x1"} aspectRatio={"1x1"}>
               <Image
                 className="w-100 p-2 m-2 rounded-4"
-                src={require("./../../images/cerro.png")}
+                src="/images/cerro.png"
                 alt="ciclismo en el bosque"
               />
             </Ratio>
@@ -99,7 +99,7 @@ const Inicio = () => {
             <Ratio aspectRatio={"1x1"}>
               <Image
                 className="imgSecciones p-2 m-2 rounded-4"
-                src={require("./../../images/teatro.png")}
+                src="/images/teatro.png"
                 alt="Teatro curico"
               />
             </Ratio>
@@ -120,7 +120,7 @@ const Inicio = () => {
               rel="noopener noreferrer">
               <Image
                 className="imgAsupiciadores w-100 p-4"
-                src={require("./../../images/nagata.png")}
+                src="images/nagata.png"
                 alt="juegos de mesa nagata"
               />
             </a>
@@ -132,7 +132,7 @@ const Inicio = () => {
               rel="noopener noreferrer">
               <Image
                 className="imgAsupiciadores w-100 p-4"
-                src={require("./../../images/maca2.png")}
+                src="/images/maca2.png"
                 alt="terapia gestal curico"
               />
             </a>
@@ -144,7 +144,7 @@ const Inicio = () => {
               rel="noopener noreferrer">
               <Image
                 className="imgAsupiciadores w-100 p-4"
-                src={require("./../../images/corpo.png")}
+                src="/images/corpo.png"
                 alt="corporacion cultural de curico"
               />
             </a>
