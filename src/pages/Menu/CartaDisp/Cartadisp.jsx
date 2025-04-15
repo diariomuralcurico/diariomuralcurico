@@ -66,7 +66,7 @@ const Cartadisp = () => {
             className="tituloModal"
             id="example-custom-modal-styling-title">
             <Container className="d-flex align-items-center">
-              <Col xs={6} sm={12} md={4} lg={4}>
+              <Col xs={6} sm={6} md={4} lg={4}>
                 <a
                   href="https://diariomuralcurico.cl/"
                   className="d-inline-block">
@@ -77,7 +77,7 @@ const Cartadisp = () => {
                   />
                 </a>
               </Col>
-              <Col xs={6} sm={12} md={8} lg={8}>
+              <Col xs={7} sm={7} md={8} lg={8}>
                 Estamos comenzando y abiertos a sugerencias
               </Col>
             </Container>
