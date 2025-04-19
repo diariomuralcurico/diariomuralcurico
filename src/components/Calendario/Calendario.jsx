@@ -1,12 +1,10 @@
-
-import React, { useState ,useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
-import { format, parse, startOfWeek, getDay } from 'date-fns';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import {Modal, Button} from "react-bootstrap";
+import { format, parse, startOfWeek, getDay } from 'date-fns';
 import  es  from 'date-fns/locale/es';
-
-import './Calendario.css';
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
 
 const Calendario = (eventos) => {
   const locales = {
@@ -21,24 +19,36 @@ const localizer = dateFnsLocalizer({
 });
 const [selectedEvent, setSelectedEvent] = useState(null);
 const [showModal, setShowModal] = useState(false);
-  const handleSelectEvent = useCallback((event) => {
+  const handleSelectEvent = (event) => {
     setSelectedEvent(event);
     setShowModal(true);
-  },[]);
-  const handleCloseModal = useCallback(() => {setShowModal(false)},[]);
-
+  };
+  const handleCloseModal = () => setShowModal(false);
+  const myEventsList= [{
+    title: "today",
+    start: new Date('2024-11-18 10:22:00'),
+    end: new Date('2024-11-18 15:42:00')
+  },
+{
+  title: "string",
+   start: new Date('2019-05-05 12:22:00'),
+  end: new Date('2019-05-05 13:42:00')
+}]
 const eventosCalendario = Object.entries(eventos).map(i=>i[1]) 
+console.log("data desde props",eventos)
+console.log("data desde eventosCalendario",eventosCalendario[0])
+console.log("data desde myeventlist",myEventsList)
   return (
-    <div className='mb-2 mt-4 m-2'>
-      <div className="calendario-container">
+    <div className='mb-2 mt-2 m-2'>
+      <div className="calendario-container" style={{ height: '500px' }}>
       <Calendar
-        className='calendario'
         localizer={localizer}
         culture="es"
         events={eventosCalendario[0]}
         startAccessor="start"
         endAccessor="end"
         defaultView='agenda'
+        style={{ height: 500 }}
         onSelectEvent={handleSelectEvent}
         messages={{
           next: 'Siguiente',
@@ -52,9 +62,6 @@ const eventosCalendario = Object.entries(eventos).map(i=>i[1])
         }}
       />
     </div>
-    
-    {showModal &&(
-
     <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
           <Modal.Title>Detalles de la Actividad</Modal.Title>
@@ -78,7 +85,6 @@ const eventosCalendario = Object.entries(eventos).map(i=>i[1])
           </Button>
         </Modal.Footer>
       </Modal>
-    )}
   </div>
   )
 }

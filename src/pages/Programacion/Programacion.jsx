@@ -30,7 +30,6 @@ useEffect (()=>{
             const response = await getDocs(collectionRef)
             const docs = response.docs.map((doc)=>{
                 const data=doc.data()
-                console.log('Eventos:',data)
                 data.id=doc.id
                 return data
         })

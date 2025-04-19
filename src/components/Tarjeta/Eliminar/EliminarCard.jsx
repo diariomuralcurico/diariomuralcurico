@@ -8,7 +8,8 @@ import {
   Form,
 } from "react-bootstrap";
 
-import { doc, deleteDoc, getFirestore } from "firebase/firestore";
+import { doc, deleteDoc, getFirestore,  } from "firebase/firestore";
+import { getStorage, ref, deleteObject } from "firebase/storage";
 import { BarLoader } from "react-spinners";
 
 import { Slide, ToastContainer, toast } from "react-toastify"; 
@@ -44,16 +45,13 @@ const EliminarCard = ({ menu, setMenu }) => {
             fechas: [actividad.fechaHoraActividad.toMillis()],
           };
         } else {
-          // Si ya está, solo agregamos la nueva fecha al arreglo
           grouped[nombre].fechas.push(actividad.fechaHoraActividad.toMillis());
         }
       }
     });
-    // Devolvemos un arreglo con las actividades agrupadas
     return Object.values(grouped);
   }, [menu]);
 
-  // Ordenar las actividades por fecha
   const menuOrdenado = useMemo(() => {
     return [...menuAgrupado].sort((a, b) => {
       const fechaA = Math.min(...a.fechas); // Usar la fecha más cercana para ordenar
@@ -62,14 +60,12 @@ const EliminarCard = ({ menu, setMenu }) => {
     });
   }, [menuAgrupado, ordenFecha]);
 
-  // Filtrar las actividades por categoría
   const menuOrdenadoFiltrado = useMemo(() => {
     return menuOrdenado.filter((plato) =>
       categoriaSeleccionada ? plato.categoria === categoriaSeleccionada : true
     );
   }, [menuOrdenado, categoriaSeleccionada]);
 
-  // Generar las categorías únicas
   const categoriasUnicas = useMemo(() => {
     return [...new Set(menuAgrupado.map((plato) => plato.categoria))];
   }, [menuAgrupado]);
@@ -85,21 +81,28 @@ const EliminarCard = ({ menu, setMenu }) => {
   const EliminarActividad = useCallback(
     async (id) => {
       try {
-        // Obtener la instancia de Firestore
         const db = getFirestore();
-
-        // Crear una referencia al documento que queremos eliminar
-        const actividadRef = doc(db, "menu", id); // "actividades" es el nombre de la colección
-
+        const storage = getStorage(); 
+  
+        const actividadRef = doc(db, "menu", id); 
+  
+        const imagenURL = menu.find((plato) => plato.id === id)?.image;
+  
+        if (imagenURL) {
+          const imageRef = ref(storage, imagenURL); 
+          await deleteObject(imageRef); 
+          console.log("Imagen eliminada con éxito.");
+        }
+  
         // Eliminar el documento de Firestore
         await deleteDoc(actividadRef);
-
+  
         // Eliminar el evento de la lista en el estado local
         const updatedMenu = menu.filter((plato) => plato.id !== id);
         setMenu(updatedMenu);
-
+  
         // Mostrar un mensaje de éxito
-        toast.success('Actividad Eliminada con éxito...', {
+        toast.success('Actividad con éxito...', {
           position: "top-center",
           autoClose: 5000,
           hideProgressBar: false,
@@ -109,9 +112,8 @@ const EliminarCard = ({ menu, setMenu }) => {
           progress: undefined,
           theme: "light",
           transition: Slide,
-          });
+        });
       } catch (error) {
-        // Mostrar un mensaje de error si algo sale mal
         toast.error('No se ha podido eliminar...', {
           position: "top-center",
           autoClose: 5000,
@@ -122,8 +124,8 @@ const EliminarCard = ({ menu, setMenu }) => {
           progress: undefined,
           theme: "light",
           transition: Slide,
-          });
-          
+        });
+  
         console.error("Error al eliminar el evento: ", error);
       }
     },
