@@ -207,7 +207,7 @@ const Reservas = () => {
                       ...prevUser,
                       esPeriodica: false,
                     }));
-                  }, 15000);
+                  }, 60000);
                 } else {
                   setUser((prevUser) => ({ ...prevUser, esPeriodica: false }));
                 }

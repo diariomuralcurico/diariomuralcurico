@@ -219,7 +219,7 @@ const Tarjeta = ({ menu }) => {
                   .format("MMMM YYYY")}{" "}
               </p>
               <p>
-                <strong>Descripción:</strong>
+                <strong>Descripción: </strong>
                 {selectedEvent.descripcion || "Sin descripción"}
               </p>
               <p>
