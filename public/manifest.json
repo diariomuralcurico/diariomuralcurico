@@ -1,21 +1,11 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Diario Mural Curicó",
+  "name": "Descubre y publica actividades recreativas, eventos culturales 🎨, talleres 📚 y panoramas en Curicó 🏞️. Diario Mural Curicó es tu espacio comunitario 🗣️ para compartir todo lo que pasa en la ciudad.",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "favicon.png",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
-    },
-    {
-      "src": "logo192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
-      "sizes": "512x512"
     }
   ],
   "start_url": ".",
