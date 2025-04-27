@@ -84,9 +84,9 @@ const EliminarCard = ({ menu, setMenu }) => {
         const db = getFirestore();
         const storage = getStorage(); 
   
-        const actividadRef = doc(db, "menu", id); 
+        const actividadRef = doc(db, "menu_test", id); 
   
-        const imagenURL = menu.find((plato) => plato.id === id)?.image;
+        const imagenURL = menu.find((plato) => plato.id === id)?.afiche;
   
         if (imagenURL) {
           const imageRef = ref(storage, imagenURL); 
@@ -190,7 +190,7 @@ const EliminarCard = ({ menu, setMenu }) => {
                             loading="lazy"
                             className=" imgCard mb-none "
                             variant="top"
-                            src={plato.image || "/imagenes/default.jpg"}
+                            src={plato.afiche || "/imagenes/default.jpg"}
                           />
                           <Card.Body>
                             <Card.Title className="tituloCard fw-bold fs-4">

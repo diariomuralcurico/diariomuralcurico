@@ -16,7 +16,7 @@ const EliminarCarta = () => {
   useEffect(() => {
     const getCard = async () => {
       try {
-        const collectionRef = collection(db, "menu");
+        const collectionRef = collection(db, "menu_test");
         const response = await getDocs(collectionRef);
 
         const docs = response.docs.map((doc) => {
@@ -35,7 +35,7 @@ const EliminarCarta = () => {
               local: es,
             });
             item.fechaFormateada = fechaFormateada;
-            return item.aprovado === 1 && fechaFinDate >= now;
+            return item.aprobado === 1 && fechaFinDate >= now;
           }
           return false;
         });

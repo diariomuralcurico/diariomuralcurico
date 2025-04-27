@@ -69,7 +69,7 @@ console.log("data desde myeventlist",myEventsList)
         <Modal.Body>
           {selectedEvent && (
             <div className="">
-              <img src={selectedEvent.image} style={{ width: "100%", marginBottom: "15px", borderRadius: "5px" }}/>
+              <img src={selectedEvent.afiche} style={{ width: "100%", marginBottom: "15px", borderRadius: "5px" }}/>
               <p><strong>Título:</strong> {selectedEvent.title}</p>
               <p><strong>Fecha:</strong> {format(selectedEvent.start, "EEEE dd 'de' MMMM yyyy", { locale: es }).toUpperCase()}</p>
               <p> <strong>Hora:</strong> {format(selectedEvent.start, "HH:mm")}</p>

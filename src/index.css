@@ -1,25 +1,30 @@
+/* Directivas de Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-body,html {
-  height: 100%;
-  margin: 0 !important;
-  padding: 0 !important;
-  overflow-x: hidden !important;
-  width: 100% !important;
-  background-color:#F8F9FA !important;
+/* Estilos globales en la capa base */
+@layer base {
+  /* Estilos para body y html */
+  body, html {
+    height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+    width: 100% !important;
+    /* background-color: #F8F9FA !important; <- Eliminar esta línea */
+  }
 
-}
+  /* Estilos para code */
+  code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace !important;
+  }
 
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace !important;
-}
-
-
-
-@font-face{
-  font-family: 'Codec-Pro-Light';
-  src: url('/public/fonts/Codec-Pro-Light.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
+  /* Definición de la fuente personalizada */
+  @font-face {
+    font-family: 'Codec-Pro-Light';
+    src: url('/public/fonts/Codec-Pro-Light.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
 }
