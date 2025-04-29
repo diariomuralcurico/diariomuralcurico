@@ -10,7 +10,7 @@ const Tarjetarevision = ({ menu, handleUpdate, handleDelete }) => {
         const confirmAprove = window.confirm("¿Estás seguro de que deseas aprobar este elemento?");
         if (confirmAprove){
             const updatedValue = currentValue === 1 ? 0 : 1;
-            handleUpdate(id, { aprovado: updatedValue }); 
+            handleUpdate(id, { aprobado: updatedValue }); 
         }
     };
     const handleDeleteCard = (id) => {
@@ -34,7 +34,7 @@ const Tarjetarevision = ({ menu, handleUpdate, handleDelete }) => {
                         <div id="contenedorcartas" className='m-2 p-2 border  rounded'>
                             <Row xs={1} sm={1} md={1} lg={2} xl={2} xxl={3} className="g-4">
                                 {menu
-                                    .filter(plato => plato.aprovado === 0)
+                                    .filter(plato => plato.aprobado === 0)
                                     .map(plato => (
                                     <Col className="d-flex" key={plato.id}>
                                         <Card className=" text-center flex-fill">
@@ -55,7 +55,7 @@ const Tarjetarevision = ({ menu, handleUpdate, handleDelete }) => {
                                                 <Card.Text>Edad mínima: {plato.edad}</Card.Text>
                                                 <Button variant='link' onClick={() => handleLink(plato.link)}>Link publicación redes</Button>
                                                 <Card.Text>Descripción: {plato.descripcion}</Card.Text>
-                                                <Button variant="success" className="m-2" onClick={() => handleApprove(plato.id, plato.aprovado)}>Aprobar</Button>
+                                                <Button variant="success" className="m-2" onClick={() => handleApprove(plato.id, plato.aprobado)}>Aprobar</Button>
                                                 <Button variant="warning" className="m-2" onClick={() => handleDeleteCard(plato.id)}>Eliminar</Button>
                                             </Card.Body>
                                             <Card.Footer className="text-muted">

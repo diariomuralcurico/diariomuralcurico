@@ -84,7 +84,7 @@ const EliminarCard = ({ menu, setMenu }) => {
         const db = getFirestore();
         const storage = getStorage(); 
   
-        const actividadRef = doc(db, "menu", id); 
+        const actividadRef = doc(db, "menu_test", id); 
   
         const imagenURL = menu.find((plato) => plato.id === id)?.image;
   

@@ -36,7 +36,7 @@ useEffect (()=>{
         const approvedItems = docs.filter((item) => {
           const now = new Date();
           const fechaFin = new Date(item.fechaHoraFinActividad.seconds * 1000);
-          return item.aprovado === 1 && fechaFin >= now;
+          return item.aprobado === 1 && fechaFin >= now;
         });
         const convertedItems = convertirActividadesACalendario(approvedItems);
         setEventos(convertedItems);

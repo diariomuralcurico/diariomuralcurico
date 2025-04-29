@@ -26,7 +26,7 @@ const Reservas = () => {
     image: "",
     direccion: "",
     descripcion: "",
-    aprovado: 0,
+    aprobado: 0,
     persona: "",
     telefono: "",
     correo: "",
@@ -42,7 +42,7 @@ const Reservas = () => {
     if (reserva.length === 0) {
       const getReserva = async () => {
         try {
-          const collectionRef = collection(db, "menu");
+          const collectionRef = collection(db, "menu_test");
           const response = await getDocs(collectionRef);
 
           const docs = response.docs.map((doc) => {
@@ -118,7 +118,7 @@ const Reservas = () => {
     }
 
     try {
-      const collectionRef2 = collection(db, "menu");
+      const collectionRef2 = collection(db, "menu_test");
 
       if (user.esPeriodica) {
         const {
