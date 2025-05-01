@@ -9,8 +9,8 @@ export const Programacion = () => {
     const convertirActividadesACalendario = (actividades) => {
         return actividades.map((actividad) => {
           const fechaHoraInicio = new Date(actividad.fechaHoraActividad.seconds * 1000);
-          const fechaHoraFin = new Date(actividad.fechaHoraFinActividad.seconds * 1000); 
-      
+          const fechaHoraFin = new Date(actividad.fechaHoraFinActividad.seconds * 1000);
+
           return {
             title: actividad.nombre,
             start: fechaHoraInicio,
@@ -36,11 +36,11 @@ useEffect (()=>{
         const approvedItems = docs.filter((item) => {
           const now = new Date();
           const fechaFin = new Date(item.fechaHoraFinActividad.seconds * 1000);
-          return item.aprobado === 1 && fechaFin >= now;
+          return item.aprovado === 1 && fechaFin >= now;
         });
         const convertedItems = convertirActividadesACalendario(approvedItems);
         setEventos(convertedItems);
-        
+
         }catch(error){
             console.log(error)
 

@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, connectFirestoreEmulator} from "firebase/firestore";
-import { connectStorageEmulator } from "firebase/storage";
-import { getStorage } from "firebase/storage";
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { getStorage, connectStorageEmulator } from "firebase/storage";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -15,13 +15,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
 
-// Conectar al emulador de Firestore si estás en desarrollo
+// Conectar al emulador de Firestore y Storage si estás en desarrollo
 if (process.env.REACT_APP_NODE_ENV === "development") {
   connectFirestoreEmulator(db, "localhost", 8080);
-  connectStorageEmulator(storage, 'localhost', 9199);
+  connectStorageEmulator(storage, "localhost", 9199);
   console.log("Conectado al emulador de Storage en localhost:9199");
   console.log("Conectado al emulador de Firestore en localhost:8080");
 }
 
-export { db, storage };
+export { db, storage, auth, googleProvider };

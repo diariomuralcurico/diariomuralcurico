@@ -42,12 +42,12 @@ const Tarjetarevision = ({ menu, handleUpdate, handleDelete }) => {
                                                 <Card.Subtitle>Organiza: {plato.organiza}</Card.Subtitle>
                                             </CardHeader>
                                             <Ratio key={'21x9'} aspectRatio={'21x9'}>
-                                                <Card.Img variant="top" src={plato.image} style={{ height: '150px', objectFit: 'cover' }} />
+                                                <Card.Img variant="top" src={plato.afiche} style={{ height: '150px', objectFit: 'cover' }} />
                                             </Ratio>
                                             <Card.Body>
                                                 <Card.Text className='text-info'>{plato.categoria}</Card.Text>
                                                 <Card.Title>{plato.nombre}</Card.Title>
-                                                <Card.Text>Valor: {plato.precio == 0 ? "Gratis" : plato.precio == -1 ? "Consultar" : `$${plato.precio}`}</Card.Text>
+                                                <Card.Text>Valor: {plato.precio.monto == 0 ? "Gratis" : plato.precio.monto == -1 ? "Consultar" : `$${plato.precio.monto}`}</Card.Text>
                                                 <Card.Text>Lugar: {plato.direccion}</Card.Text>
                                                 <Card.Text>Responsable: {plato.persona}</Card.Text>
                                                 <Card.Text>Fono: {plato.telefono}</Card.Text>
