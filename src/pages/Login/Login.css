@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .font-codec {
+        font-family: "Codec-Pro-Light", "Roboto", sans-serif;
+    }
+}
+
+/* Ensure peer class works with floating labels */
+input:placeholder-shown + label {
+    top: 0.75rem;
+    font-size: 1rem;
+}
+
+input:focus + label,
+input:not(:placeholder-shown) + label {
+    top: -1.5rem;
+    font-size: 0.875rem;
+    color: #000000;
+}
