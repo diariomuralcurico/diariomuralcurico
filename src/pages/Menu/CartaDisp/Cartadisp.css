@@ -30,3 +30,14 @@ a{
 a:hover{
     text-decoration: underline;
 }
+
+.modal-header {
+  position: relative;
+}
+
+.modal-header .btn-close {
+  position: absolute;
+  top: 17px;
+  right: 17px;
+  z-index: 1051;
+}
