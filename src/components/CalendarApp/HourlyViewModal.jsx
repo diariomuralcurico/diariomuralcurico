@@ -18,28 +18,19 @@ function HourlyViewModal({
     { length: 24 },
     (_, i) => `${String(i).padStart(2, "0")}:00`,
   );
-
   const dateString = date ? date.toISOString().split("T")[0] : "";
 
-  // Filter events to include multi-day events that span the selected date
   const dayEvents = events
     .filter((event) => {
       if (!event.date || !event.fechaFin) return false;
-
       const eventStartDate = new Date(event.date);
       const eventEndDate = new Date(event.fechaFin);
       const currentDate = new Date(date).setHours(0, 0, 0, 0);
-
-      // Normalize dates to start of day for comparison
       const eventStart = eventStartDate.setHours(0, 0, 0, 0);
       const eventEnd = eventEndDate.setHours(23, 59, 59, 999);
-
       if (event.recurrence === "None") {
-        // Include events that span or occur on the selected date
         return currentDate >= eventStart && currentDate <= eventEnd;
       }
-
-      // Handle recurring events
       return event.recurrenceDates.some((recDate) => {
         const recurrenceDate = new Date(recDate).setHours(0, 0, 0, 0);
         return recurrenceDate === currentDate;
@@ -49,25 +40,20 @@ function HourlyViewModal({
       const eventStartDate = new Date(event.date);
       const eventEndDate = new Date(event.fechaFin);
       const selectedDate = new Date(date);
-
       let displayTime = event.time || "00:00";
       let displayEndTime = event.endTime || "23:59";
-
-      // Adjust display times for multi-day events
       if (event.recurrence === "None") {
         const isFirstDay =
           eventStartDate.toISOString().split("T")[0] === dateString;
         const isLastDay =
           eventEndDate.toISOString().split("T")[0] === dateString;
-
         if (!isFirstDay) {
-          displayTime = "00:00"; // Start at midnight for non-first days
+          displayTime = "00:00";
         }
         if (!isLastDay) {
-          displayEndTime = "23:59"; // End at end of day for non-last days
+          displayEndTime = "23:59";
         }
       } else {
-        // Handle recurring events
         const matchingRecurrence = event.recurrenceDates.find((recDate) => {
           const recDateObj = new Date(recDate);
           return recDateObj.toISOString().split("T")[0] === dateString;
@@ -83,7 +69,6 @@ function HourlyViewModal({
           displayEndTime = endDateObj.toTimeString().slice(0, 5);
         }
       }
-
       return {
         ...event,
         time: displayTime,
@@ -136,7 +121,6 @@ function HourlyViewModal({
       if (startDiff !== 0) return startDiff;
       return timeToMinutes(b.endTime) - timeToMinutes(a.endTime);
     });
-
     const lanes = [];
     sortedEvents.forEach((event) => {
       let lane = 0;
@@ -155,7 +139,6 @@ function HourlyViewModal({
       if (!lanes[lane]) lanes[lane] = [];
       lanes[lane].push(event);
     });
-
     return sortedEvents.map((event) => {
       const lane = lanes.findIndex((l) => l.includes(event));
       const maxLane = lanes.length;
@@ -164,7 +147,6 @@ function HourlyViewModal({
   };
 
   const eventsWithLanes = assignLanes(dayEvents);
-
   const hourRowHeight = 60;
   const totalHeight = 24 * hourRowHeight;
   const timeLabelWidth = "80px";
@@ -177,7 +159,7 @@ function HourlyViewModal({
         show ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
     >
-      <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col">
+      <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col hourly-view-container">
         <div className="flex-shrink-0 mb-4">
           <h2 className="text-2xl font-semibold text-center text-gray-800 font-codec">
             Eventos del{" "}
@@ -196,7 +178,8 @@ function HourlyViewModal({
             {hours.map((hour, index) => (
               <div
                 key={`hour-${hour}`}
-                className="absolute left-0 right-0 border-b border-gray-200"
+                className="absolute left-0 right-0 border-b border-gray-200 hour-slot"
+                data-time={hour}
                 style={{
                   top: `${index * hourRowHeight}px`,
                   height: `${hourRowHeight}px`,
@@ -209,6 +192,7 @@ function HourlyViewModal({
                   {hour}
                 </div>
                 <button
+                  data-hour={hour}
                   onClick={() => openEventDialog(hour)}
                   className="absolute right-1 top-1 w-6 h-6 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-full hover:bg-indigo-200 transition duration-200 text-xs z-30 font-codec"
                   style={{ left: `calc(${timeLabelWidth} + 4px)` }}
@@ -223,10 +207,8 @@ function HourlyViewModal({
               const endMinutes = timeToMinutes(event.endTime);
               const durationMinutes = Math.max(0, endMinutes - startMinutes);
               if (durationMinutes === 0) return null;
-
               const topPosition = (startMinutes / (24 * 60)) * totalHeight;
               const eventHeight = (durationMinutes / (24 * 60)) * totalHeight;
-
               const effectiveMaxLane = Math.min(event.maxLane, maxLanes) || 1;
               const laneFraction =
                 effectiveMaxLane > 1 ? event.lane / effectiveMaxLane : 0;
@@ -234,7 +216,6 @@ function HourlyViewModal({
                 effectiveMaxLane > 1 ? 1 / effectiveMaxLane : 1;
               const eventLeft = `calc(${timeLabelWidth} + ${buttonWidth} + ${laneFraction} * (100% - ${timeLabelWidth} - ${buttonWidth}))`;
               const eventWidth = `calc(${widthFraction} * (100% - ${timeLabelWidth} - ${buttonWidth}) - 10px)`;
-
               return (
                 <div
                   key={event.id}

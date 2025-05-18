@@ -1,8 +1,9 @@
 import imageCompression from "browser-image-compression";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import CalendarView from "./CalendarView";
 import EventDialog from "./EventDialog";
 import HourlyViewModal from "./HourlyViewModal";
+import TourModal from "./TourModal";
 import PropTypes from "prop-types";
 import { db, storage } from "../../config/Firebase";
 import {
@@ -30,6 +31,11 @@ function CalendarApp({
   const [showDialog, setShowDialog] = useState(false);
   const [showHourlyModal, setShowHourlyModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [tourStep, setTourStep] = useState(0);
+  const [showTour, setShowTour] = useState(false);
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedDateForHours, setSelectedDateForHours] = useState(null);
+  const calendarRef = useRef(null);
 
   const initialEventState = {
     title: "",
@@ -53,11 +59,189 @@ function CalendarApp({
     endRecurrenceDate: "",
     recurrenceDates: [],
   };
-
   const [newEvent, setNewEvent] = useState(initialEventState);
   const [editingEvent, setEditingEvent] = useState(null);
-  const [selectedDay, setSelectedDay] = useState(null);
-  const [selectedDateForHours, setSelectedDateForHours] = useState(null);
+
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowDate = tomorrow.getDate();
+
+  // Tour steps with actions
+  const tourSteps = [
+    {
+      title: "¡Bienvenido a tu Calendario!",
+      message:
+        "Esta es tu herramienta para publicar actividades. Haz doble clic en cualquier día para agregar un evento. Será revisado por nosotros.",
+      target: ".calendar-day",
+      position: "bottom",
+      action: {
+        type: "doubleClick",
+        target: `div[data-day="${tomorrowDate}"]`,
+        description: "Haz doble clic aquí para abrir la vista por horas",
+      },
+    },
+    {
+      title: "Explora la Vista por Horas",
+      message:
+        "En la vista por horas, puedes ver los eventos del día y agregar nuevos. Desplázate para ver un ejemplo de horario.",
+      target: ".hourly-view-container",
+      position: "right",
+      action: {
+        type: "scroll",
+        target: ".hourly-view-container",
+        scrollTo: "14:00",
+        highlight: true,
+        description: "Desplázate para ver el horario de las 14:00",
+      },
+    },
+    {
+      title: "Clickea en botón de mas",
+      message: "Se abrirá el formulario del evento",
+      target: ".hourly-view-container",
+      position: "right",
+      action: {
+        type: "click",
+        target: `button[data-hour="14:00"]`,
+        description: "Haz doble clic aquí para abrir la vista por horas",
+      },
+    },
+    {
+      title: "Crea un Evento",
+      message:
+        "Ahora, crea un evento rellenando el formulario. Te mostraremos cómo hacerlo.",
+      target: null,
+      position: "center",
+      action: {
+        type: "fillForm",
+        formData: {
+          title: "Evento de Ejemplo",
+          date: new Date().toISOString().split("T")[0],
+          time: "14:00",
+          endTime: "15:00",
+          fechaFin: new Date().toISOString().split("T")[0],
+          description: "Este es un evento de prueba para la guía.",
+          direccion: "Calle Ejemplo 123, Curicó",
+          organiza: "Diario Mural Curicó",
+          categoria: "Artes y diseño",
+          precio: "0",
+          persona: "Juan Pérez",
+          telefono: "+56912345678",
+          correo: "juan@ejemplo.com",
+          link: "https://ejemplo.com",
+          edad: "Todas las edades",
+          color: "#f9a8d4",
+          recurrence: "None",
+        },
+        description: "Mira cómo rellenamos un formulario de evento",
+      },
+    },
+    {
+      title: "Navega por los Meses",
+      message: "Usa los botones 'Anterior' y 'Siguiente' para cambiar de mes.",
+      target: ".month-nav",
+      position: "bottom",
+      action: null,
+    },
+    {
+      title: "¡Listo para Empezar!",
+      message:
+        "¡Explora y comienza a publicar tus eventos! Puedes cerrar esta guía ahora.",
+      target: null,
+      position: "center",
+      action: null,
+    },
+  ];
+
+  // Check if user has seen the tour
+  useEffect(() => {
+    const hasSeenTour = localStorage.getItem(`tourSeen_${user?.uid}`);
+    if (user?.uid && !hasSeenTour) {
+      setShowTour(true);
+      // Select a day for the first step
+      const today = new Date();
+      setSelectedDay(today);
+      setSelectedDateForHours(today);
+    }
+  }, [user]);
+
+  // Execute tour actions
+  const executeAction = (action) => {
+    if (!action) return;
+    let targetElement = document.querySelector(action.target);
+    switch (action.type) {
+      case "doubleClick":
+        if (targetElement) {
+          const event = new MouseEvent("dblclick", {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+          });
+          targetElement.dispatchEvent(event);
+        }
+        break;
+      case "click":
+        targetElement = document.querySelector(action.target);
+        if (targetElement) {
+          const event = new MouseEvent("click", {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+          });
+          targetElement.dispatchEvent(event);
+        }
+        break;
+      case "scroll":
+        const scrollContainer = document.querySelector(action.target);
+        if (scrollContainer) {
+          const timeSlot = Array.from(
+            scrollContainer.querySelectorAll(".hour-slot"),
+          ).find((slot) => slot.dataset.time === action.scrollTo);
+          if (timeSlot) {
+            timeSlot.scrollIntoView({ behavior: "smooth", block: "center" });
+            if (action.highlight) {
+              timeSlot.classList.add("highlight");
+              setTimeout(() => timeSlot.classList.remove("highlight"), 3000);
+            }
+          }
+        }
+        break;
+      case "fillForm":
+        setNewEvent({
+          ...initialEventState,
+          ...action.formData,
+          date: action.formData.date,
+          fechaFin: action.formData.fechaFin,
+        });
+        setShowDialog(true);
+        setEditingEvent(null);
+        setSelectedDay(new Date(action.formData.date));
+        break;
+      default:
+        console.warn("Unknown action type:", action.type);
+    }
+  };
+
+  const handleTourNext = () => {
+    if (tourStep < tourSteps.length - 1) {
+      setTourStep(tourStep + 1);
+      // Close any open modals for clean transition
+      setShowDialog(false);
+      setShowHourlyModal(false);
+      executeAction(tourSteps[tourStep].action);
+    } else {
+      setShowTour(false);
+      setShowDialog(false);
+      setShowHourlyModal(false);
+      // localStorage.setItem(`tourSeen_${user?.uid}`, "true");
+    }
+  };
+
+  const handleTourSkip = () => {
+    setShowTour(false);
+    setShowDialog(false);
+    setShowHourlyModal(false);
+    // localStorage.setItem(`tourSeen_${user?.uid}`, "true");
+  };
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -101,69 +285,12 @@ function CalendarApp({
         console.error("Error fetching events from Firestore:", error);
       }
     };
-
     if (user?.uid) fetchEvents();
   }, [user]);
 
   const handleAddOrUpdateEvent = async (setErrors = () => {}) => {
     setLoading(true);
     const newErrors = {};
-
-    // if (!newEvent.title)
-    //   newErrors.title = "El nombre de la actividad es obligatorio";
-    // if (!newEvent.date) newErrors.date = "La fecha es obligatoria";
-    // if (!newEvent.fechaFin)
-    //   newErrors.fechaFin = "La fecha de fin es obligatoria";
-    // if (!newEvent.description)
-    //   newErrors.description = "La descripción es obligatoria";
-    // if (!newEvent.direccion)
-    //   newErrors.direccion = "La dirección es obligatoria";
-    // if (!newEvent.organiza)
-    //   newErrors.organiza = "La institución organizadora es obligatoria";
-    // if (!newEvent.precio) newErrors.precio = "El precio es obligatorio";
-    // if (!newEvent.persona) newErrors.persona = "El responsable es obligatorio";
-    // if (!newEvent.telefono) newErrors.telefono = "El teléfono es obligatorio";
-    // if (!newEvent.correo) newErrors.correo = "El correo es obligatorio";
-    // if (!newEvent.link) newErrors.link = "El link es obligatorio";
-    // if (!newEvent.categoria)
-    //   newErrors.categoria = "La categoría es obligatoria";
-    // if (!editingEvent && (!newEvent.afiche || newEvent.afiche.length === 0)) {
-    //   newErrors.afiche = "Al menos un afiche es obligatorio";
-    // }
-
-    // if (showHourlyModal) {
-    //   if (!newEvent.time) newErrors.time = "La hora de inicio es obligatoria";
-    //   if (!newEvent.endTime)
-    //     newErrors.endTime = "La hora de fin es obligatoria";
-    //   if (
-    //     newEvent.endTime &&
-    //     newEvent.time &&
-    //     newEvent.date.split("T")[0] === newEvent.fechaFin.split("T")[0] &&
-    //     newEvent.endTime <= newEvent.time
-    //   ) {
-    //     newErrors.endTime =
-    //       "La hora de fin debe ser posterior a la hora de inicio";
-    //   }
-    // }
-
-    // if (newEvent.recurrence !== "None") {
-    //   if (!newEvent.endRecurrenceDate) {
-    //     newErrors.endRecurrenceDate =
-    //       "La fecha de fin de recurrencia es obligatoria";
-    //   }
-    //   if (newEvent.endRecurrenceDate) {
-    //     const endRecurDate = new Date(newEvent.endRecurrenceDate);
-    //     if (isNaN(endRecurDate.getTime())) {
-    //       newErrors.endRecurrenceDate =
-    //         "La fecha de fin de recurrencia es inválida";
-    //     }
-    //   }
-    //   if (newEvent.date.split("T")[0] !== newEvent.fechaFin.split("T")[0]) {
-    //     newErrors.endRecurrenceDate =
-    //       "No puedes crear un evento recurrente que dure mas de un día";
-    //   }
-    // }
-
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       setLoading(false);
@@ -196,10 +323,6 @@ function CalendarApp({
     const endDateStr = `${normalizedFechaFin}T${newEvent.endTime || "23:59"}:59`;
     const endRecurrenceDateStr = `${normalizedEndRecurrenceDate}T${newEvent.endTime || "23:59"}:59`;
 
-    console.log("startDateStr:", startDateStr);
-    console.log("endDateStr:", endDateStr);
-    console.log("endRecurrenceDateStr:", endRecurrenceDateStr);
-
     const startDate = new Date(startDateStr);
     const endRecurDate =
       newEvent.recurrence !== "None" && endRecurrenceDateStr
@@ -208,6 +331,7 @@ function CalendarApp({
     const endDate = new Date(endDateStr);
 
     let imageUrls = editingEvent ? [...(newEvent.afiche || [])] : [];
+
     if (
       newEvent.afiche &&
       newEvent.afiche.some((file) => file instanceof File)
@@ -217,16 +341,13 @@ function CalendarApp({
           newEvent.afiche
             .filter((file) => file instanceof File)
             .map(async (file) => {
-              // Opciones de compresión
               const compressionOptions = {
-                maxSizeMB: 1, // Máximo 1MB
-                maxWidthOrHeight: 1920, // Máxima resolución de 1920px
-                useWebWorker: true, // Usar Web Worker para no bloquear el hilo principal
+                maxSizeMB: 1,
+                maxWidthOrHeight: 1920,
+                useWebWorker: true,
               };
-
               let fileToUpload = file;
               try {
-                // Comprimir la imagen
                 fileToUpload = await imageCompression(file, compressionOptions);
                 console.log(
                   `Imagen comprimida: ${file.name}, tamaño original: ${
@@ -238,10 +359,7 @@ function CalendarApp({
                   "Error al comprimir la imagen:",
                   compressionError,
                 );
-                // Usar el archivo original como fallback
               }
-
-              // Subir la imagen (comprimida o original)
               const uniqueImageName = `images/${Date.now()}-${file.name}`;
               const imageRef = ref(storage, uniqueImageName);
               await uploadBytes(imageRef, fileToUpload);
@@ -444,7 +562,10 @@ function CalendarApp({
   };
 
   return (
-    <div className={`max-w-5xl mx-auto p-4 sm:p-6 ${className}`}>
+    <div
+      className={`max-w-5xl mx-auto p-4 sm:p-6 ${className}`}
+      ref={calendarRef}
+    >
       <h1
         className="text-3xl font-bold text-center mb-8 text-gray-800 font-codec"
         style={{ display: "block", marginLeft: "auto", marginRight: "auto" }}
@@ -491,6 +612,16 @@ function CalendarApp({
         showTimeField={true}
         isEditing={!!editingEvent}
       />
+      {showTour && (
+        <TourModal
+          step={tourSteps[tourStep]}
+          currentStep={tourStep}
+          totalSteps={tourSteps.length}
+          onNext={handleTourNext}
+          onSkip={handleTourSkip}
+          onAction={() => executeAction(tourSteps[tourStep].action)}
+        />
+      )}
       {loading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
           <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">

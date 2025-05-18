@@ -59,7 +59,6 @@ function CalendarView({
       );
     }
   }
-
   for (let i = 1; i < startDay; i++) {
     days.push(<div key={`empty-${i}`} className="h-40 bg-gray-100"></div>);
   }
@@ -108,7 +107,8 @@ function CalendarView({
     );
     const dateString = date.toISOString().split("T")[0];
     const dayOfWeek = date.getDay();
-    const daysUntilEndOfWeek = 6 - dayOfWeek; // From current day to Saturday
+    const daysUntilEndOfWeek = 6 - dayOfWeek;
+
     const dayEvents = eventSpans
       .filter((event) => {
         const eventDate = new Date(event.displayDate);
@@ -122,11 +122,11 @@ function CalendarView({
     days.push(
       <div
         key={day}
-        className={`h-40 border p-2 relative cursor-pointer hover:bg-indigo-50 transition duration-200 ${
+        className={`h-40 border p-2 relative cursor-pointer hover:bg-indigo-50 transition duration-200 calendar-day ${
           isSelected ? "bg-indigo-100" : ""
         }`}
-        //onClick={() => onDayClick(date)}
         onDoubleClick={() => openHourlyView(date)}
+        data-day={day}
       >
         <span className="font-medium text-lg">{day}</span>
         <div className="mt-1 h-[134px] overflow-hidden">
@@ -137,19 +137,15 @@ function CalendarView({
             const currentDayIndex = differenceInDays(date, eventStart);
             const remainingDaysInMonth =
               differenceInDays(lastDayOfMonth, date) + 1;
-
-            // Calculate display span, ensuring it doesn't exceed the week or month
             const displaySpanDays = Math.min(
               totalSpanDays - currentDayIndex,
               daysUntilEndOfWeek + 1,
               remainingDaysInMonth,
             );
 
-            const cellWidth = 100; // Percentage width of a single cell
-            const borderWidth = 1; // Border width in pixels
-            const marginBetweenEvents = 2; // Margin between events in pixels
-
-            // Calculate width to fit within the week
+            const cellWidth = 100;
+            const borderWidth = 1;
+            const marginBetweenEvents = 2;
             const totalWidth = `calc(${
               displaySpanDays * cellWidth
             }% + ${(displaySpanDays - 1) * borderWidth}px - ${
@@ -170,7 +166,6 @@ function CalendarView({
                   backgroundColor: event.color,
                   width: "100%",
                   minWidth: "100px",
-
                   height: "24px",
                   marginBottom: "2px",
                 }}
@@ -224,7 +219,7 @@ function CalendarView({
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg mb-8">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 month-nav">
         <button
           onClick={prevMonth}
           className="text-indigo-600 hover:text-indigo-800"
