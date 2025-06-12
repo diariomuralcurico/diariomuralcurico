@@ -18,8 +18,10 @@ function HourlyViewModal({
     { length: 24 },
     (_, i) => `${String(i).padStart(2, "0")}:00`,
   );
+
   const dateString = date ? date.toISOString().split("T")[0] : "";
 
+  // Filter events to include multi-day events that span the selected date
   const dayEvents = events
     .filter((event) => {
       if (!event.date || !event.fechaFin) return false;
@@ -147,6 +149,7 @@ function HourlyViewModal({
   };
 
   const eventsWithLanes = assignLanes(dayEvents);
+
   const hourRowHeight = 60;
   const totalHeight = 24 * hourRowHeight;
   const timeLabelWidth = "80px";
@@ -209,6 +212,7 @@ function HourlyViewModal({
               if (durationMinutes === 0) return null;
               const topPosition = (startMinutes / (24 * 60)) * totalHeight;
               const eventHeight = (durationMinutes / (24 * 60)) * totalHeight;
+
               const effectiveMaxLane = Math.min(event.maxLane, maxLanes) || 1;
               const laneFraction =
                 effectiveMaxLane > 1 ? event.lane / effectiveMaxLane : 0;

@@ -59,6 +59,7 @@ function CalendarApp({
     endRecurrenceDate: "",
     recurrenceDates: [],
   };
+
   const [newEvent, setNewEvent] = useState(initialEventState);
   const [editingEvent, setEditingEvent] = useState(null);
 
@@ -341,13 +342,16 @@ function CalendarApp({
           newEvent.afiche
             .filter((file) => file instanceof File)
             .map(async (file) => {
+              // Opciones de compresión
               const compressionOptions = {
-                maxSizeMB: 1,
-                maxWidthOrHeight: 1920,
-                useWebWorker: true,
+                maxSizeMB: 1, // Máximo 1MB
+                maxWidthOrHeight: 1920, // Máxima resolución de 1920px
+                useWebWorker: true, // Usar Web Worker para no bloquear el hilo principal
               };
+
               let fileToUpload = file;
               try {
+                // Comprimir la imagen
                 fileToUpload = await imageCompression(file, compressionOptions);
                 console.log(
                   `Imagen comprimida: ${file.name}, tamaño original: ${

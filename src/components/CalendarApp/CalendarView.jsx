@@ -161,12 +161,10 @@ function CalendarView({
             return (
               <button
                 key={`${event.id}-${dateString}`}
-                className="text-left text-xs text-white px-1 py-0 rounded truncate hover:opacity-80 transition duration-200 flex items-center"
+                className="text-left text-xs text-white px-1 py-0 rounded truncate hover:opacity-80 transition duration-200 flex items-center max-sm:rounded-full max-sm:h-[10px] max-sm:p-0 sm:h-[24px] sm:text-xs sm:px-1 sm:py-0 sm:rounded sm:truncate sm:text-white sm:flex sm:items-center"
                 style={{
                   backgroundColor: event.color,
                   width: "100%",
-                  minWidth: "100px",
-                  height: "24px",
                   marginBottom: "2px",
                 }}
                 title={`${event.title} (${format(eventStart, "dd/MM/yyyy")} - ${format(
@@ -208,7 +206,9 @@ function CalendarView({
                   setShowDialog(true);
                 }}
               >
-                {event.time ? `[${event.time}] ${event.title}` : event.title}
+                <span className="max-sm:hidden">
+                  {event.time ? `[${event.time}] ${event.title}` : event.title}
+                </span>
               </button>
             );
           })}
@@ -219,14 +219,14 @@ function CalendarView({
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg mb-8">
-      <div className="flex justify-between items-center mb-4 month-nav">
+      <div className="flex justify-between items-center mb-4">
         <button
           onClick={prevMonth}
-          className="text-indigo-600 hover:text-indigo-800"
+          className="text-indigo-600 hover:text-indigo-800 text-sm sm:text-base"
         >
           ← Anterior
         </button>
-        <h2 className="text-xl font-semibold">
+        <h2 className="text-xl font-semibold text-center flex-1 mx-2 sm:mx-4">
           {currentMonth.toLocaleString("es-CL", {
             month: "long",
             year: "numeric",
@@ -234,7 +234,7 @@ function CalendarView({
         </h2>
         <button
           onClick={nextMonth}
-          className="text-indigo-600 hover:text-indigo-800"
+          className="text-indigo-600 hover:text-indigo-800 text-sm sm:text-base"
         >
           Siguiente →
         </button>
