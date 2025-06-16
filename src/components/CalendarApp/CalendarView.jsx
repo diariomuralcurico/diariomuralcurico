@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import {
   format,
   isSameDay,
@@ -31,19 +31,66 @@ function CalendarView({
   const lastDayOfMonth = endOfMonth(currentMonth);
   const startDay = firstDayOfMonth.getDay();
   const daysInMonth = lastDayOfMonth.getDate();
+  const calendarRef = useRef(null);
+  const touchStartX = useRef(null);
+  const [slideDirection, setSlideDirection] = useState(null); // Track animation direction
 
-  const prevMonth = () => {
-    setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1),
-    );
-    setSelectedDay(null);
+  const prevMonth = (isSwipe = false) => {
+    if (isSwipe) {
+      setSlideDirection("slide-right"); // Slide out to the right for previous month swipe
+      setTimeout(() => {
+        setCurrentMonth(
+          new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1),
+        );
+        setSlideDirection(null); // Reset animation
+        setSelectedDay(null);
+      }, 250); // Match the transition duration
+    } else {
+      // No animation for button click
+      setCurrentMonth(
+        new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1),
+      );
+      setSelectedDay(null);
+    }
   };
 
-  const nextMonth = () => {
-    setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1),
-    );
-    setSelectedDay(null);
+  const nextMonth = (isSwipe = false) => {
+    if (isSwipe) {
+      setSlideDirection("slide-left"); // Slide out to the left for next month swipe
+      setTimeout(() => {
+        setCurrentMonth(
+          new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1),
+        );
+        setSlideDirection(null); // Reset animation
+        setSelectedDay(null);
+      }, 250); // Match the transition duration
+    } else {
+      // No animation for button click
+      setCurrentMonth(
+        new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1),
+      );
+      setSelectedDay(null);
+    }
+  };
+
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+
+    const touchEndX = e.changedTouches[0].clientX;
+    const deltaX = touchEndX - touchStartX.current;
+    const minSwipeDistance = 50; // Minimum swipe distance in pixels
+
+    if (deltaX > minSwipeDistance) {
+      prevMonth(true); // Swipe right: previous month with animation
+    } else if (deltaX < -minSwipeDistance) {
+      nextMonth(true); // Swipe left: next month with animation
+    }
+
+    touchStartX.current = null;
   };
 
   const openHourlyView = (date) => {
@@ -108,7 +155,6 @@ function CalendarView({
     const dateString = date.toISOString().split("T")[0];
     const dayOfWeek = date.getDay();
     const daysUntilEndOfWeek = 6 - dayOfWeek;
-
     const dayEvents = eventSpans
       .filter((event) => {
         const eventDate = new Date(event.displayDate);
@@ -142,16 +188,12 @@ function CalendarView({
               daysUntilEndOfWeek + 1,
               remainingDaysInMonth,
             );
-
             const cellWidth = 100;
             const borderWidth = 1;
             const marginBetweenEvents = 2;
-            const totalWidth = `calc(${
-              displaySpanDays * cellWidth
-            }% + ${(displaySpanDays - 1) * borderWidth}px - ${
-              displaySpanDays > 1 ? marginBetweenEvents : 0
-            }px)`;
-
+            const totalWidth = `calc(${displaySpanDays * cellWidth}% + ${
+              (displaySpanDays - 1) * borderWidth
+            }px - ${displaySpanDays > 1 ? marginBetweenEvents : 0}px)`;
             const isStartOfWeek = dayOfWeek === 0;
             const isEndOfWeek = dayOfWeek === 6;
             const isLastDayInDisplay =
@@ -217,23 +259,42 @@ function CalendarView({
     );
   }
 
+  // Capitalize the first letter of the month
+  const monthName = currentMonth.toLocaleString("es-CL", { month: "long" });
+  const capitalizedMonth =
+    monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg mb-8">
+    <div
+      className={`bg-white p-6 rounded-lg shadow-lg mb-8 overflow-hidden transform transition-all duration-250 ease-in-out ${
+        slideDirection === "slide-left"
+          ? "-translate-x-[20%] opacity-70"
+          : slideDirection === "slide-right"
+            ? "translate-x-[20%] opacity-70"
+            : ""
+      }`}
+      ref={calendarRef}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <div className="flex justify-between items-center mb-4">
         <button
-          onClick={prevMonth}
+          onClick={() => prevMonth(false)}
           className="text-indigo-600 hover:text-indigo-800 text-sm sm:text-base"
         >
           ← Anterior
         </button>
-        <h2 className="text-xl font-semibold text-center flex-1 mx-2 sm:mx-4">
-          {currentMonth.toLocaleString("es-CL", {
-            month: "long",
-            year: "numeric",
-          })}
-        </h2>
+        <div className="text-center flex-1 mx-2 sm:mx-4">
+          <h2 className="text-xl font-semibold leading-tight">
+            {capitalizedMonth}
+            <br />
+            <span className="text-sm">de</span>
+            <br />
+            {currentMonth.toLocaleString("es-CL", { year: "numeric" })}
+          </h2>
+        </div>
         <button
-          onClick={nextMonth}
+          onClick={() => nextMonth(false)}
           className="text-indigo-600 hover:text-indigo-800 text-sm sm:text-base"
         >
           Siguiente →

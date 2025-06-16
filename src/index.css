@@ -1,4 +1,3 @@
-/* Directivas de Tailwind CSS */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,9 +8,25 @@
     transition: all 0.3s ease;
 }
 
-/* Estilos globales en la capa base */
+.tutorial-focus {
+    box-shadow: 0 0 10px 3px rgba(79, 70, 229, 0.8);
+    border: 2px solid #4f46e5;
+    animation: pulse 1s ease-in-out;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
 @layer base {
-    /* Estilos para body y html */
     body,
     html {
         height: 100%;
@@ -19,20 +34,62 @@
         padding: 0 !important;
         overflow-x: hidden !important;
         width: 100% !important;
-        /* background-color: #F8F9FA !important; <- Eliminar esta línea */
+        font-family: "Codec-Pro-Light", "Roboto", sans-serif !important;
     }
 
-    /* Estilos para code */
     code {
         font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
             monospace !important;
     }
 
-    /* Definición de la fuente personalizada */
     @font-face {
         font-family: "Codec-Pro-Light";
         src: url("/public/fonts/Codec-Pro-Light.ttf") format("truetype");
         font-weight: normal;
         font-style: normal;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    span,
+    div,
+    a,
+    button,
+    input,
+    textarea,
+    select,
+    label,
+    li,
+    .btn,
+    .card,
+    .modal,
+    .form-control,
+    .form-label,
+    .form-select {
+        font-family: "Codec-Pro-Light", "Roboto", sans-serif !important;
+    }
+
+    /* Asegura que el contenedor del calendario sea desplazable en móviles */
+    .max-w-5xl {
+        overflow-y: auto;
+        max-height: 100vh; /* Limita la altura para permitir scroll */
+        -webkit-overflow-scrolling: touch; /* Mejora el scroll en iOS */
+    }
+
+    /* Ajuste para los días del calendario */
+    .calendar-day {
+        touch-action: auto; /* Permite interacción táctil */
+    }
+
+    /* Asegura que el contenedor principal no bloquee el scroll */
+    html,
+    body {
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
     }
 }

@@ -14,10 +14,12 @@ function EventDialog({
 }) {
   useEscapeKey(show, onClose);
   const [errors, setErrors] = useState({});
+  const [phoneValid, setPhoneValid] = useState(null); // Estado para validación en tiempo real del teléfono
 
   useEffect(() => {
     if (!show) {
       setErrors({});
+      setPhoneValid(null);
     }
   }, [show]);
 
@@ -30,6 +32,30 @@ function EventDialog({
       }
       return updatedEvent;
     });
+
+    // Validación en tiempo real para el teléfono
+    if (name === "telefono") {
+      const chileanPhoneRegex = /^\+56[9]\d{8}$/;
+      setPhoneValid(chileanPhoneRegex.test(value));
+    }
+  };
+
+  const handlePhoneInput = (e) => {
+    let value = e.target.value;
+    // Eliminar caracteres no permitidos, excepto +56 y dígitos
+    value = value.replace(/[^+\d]/g, "");
+    // Asegurar que comience con +56
+    if (!value.startsWith("+56")) {
+      value = "+56" + value.replace(/^\+56/, "");
+    }
+    // Limitar a +56 seguido de 9 dígitos
+    if (value.length > 12) {
+      value = value.slice(0, 12);
+    }
+    setNewEvent((prev) => ({ ...prev, telefono: value }));
+    // Validación en tiempo real
+    const chileanPhoneRegex = /^\+56[9]\d{8}$/;
+    setPhoneValid(chileanPhoneRegex.test(value));
   };
 
   const handleFileChange = (e) => {
@@ -51,20 +77,25 @@ function EventDialog({
     const newErrors = {};
     const today = new Date().toISOString().split("T")[0];
 
+    // Validación de título
     if (
       !newEvent.title ||
       typeof newEvent.title !== "string" ||
       newEvent.title.trim() === ""
     ) {
       newErrors.title = "El nombre de la actividad es obligatorio.";
+    } else if (newEvent.title.length > 100) {
+      newErrors.title = "El título no puede exceder los 100 caracteres.";
     }
 
+    // Validación de fecha
     if (!newEvent.date || isNaN(new Date(newEvent.date).getTime())) {
       newErrors.date = "La fecha de inicio es obligatoria y debe ser válida.";
     } else if (newEvent.date < today) {
       newErrors.date = "La fecha de inicio no puede ser anterior a hoy.";
     }
 
+    // Validación de hora si showTimeField está activo
     if (showTimeField) {
       const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
       if (!newEvent.time || !timeRegex.test(newEvent.time)) {
@@ -77,7 +108,7 @@ function EventDialog({
       } else if (
         newEvent.time &&
         newEvent.endTime &&
-        newEvent.date.split("T")[0] == newEvent.fechaFin.split("T")[0] &&
+        newEvent.date.split("T")[0] === newEvent.fechaFin.split("T")[0] &&
         newEvent.endTime <= newEvent.time
       ) {
         newErrors.endTime =
@@ -85,30 +116,42 @@ function EventDialog({
       }
     }
 
+    // Validación de descripción
     if (
       !newEvent.description ||
       typeof newEvent.description !== "string" ||
       newEvent.description.trim() === ""
     ) {
       newErrors.description = "La descripción es obligatoria.";
+    } else if (newEvent.description.length > 700) {
+      newErrors.description =
+        "La descripción no puede exceder los 700 caracteres.";
     }
 
+    // Validación de dirección
     if (
       !newEvent.direccion ||
       typeof newEvent.direccion !== "string" ||
       newEvent.direccion.trim() === ""
     ) {
       newErrors.direccion = "La dirección es obligatoria.";
+    } else if (newEvent.direccion.length > 200) {
+      newErrors.direccion = "La dirección no puede exceder los 200 caracteres.";
     }
 
+    // Validación de institución organizadora
     if (
       !newEvent.organiza ||
       typeof newEvent.organiza !== "string" ||
       newEvent.organiza.trim() === ""
     ) {
       newErrors.organiza = "La institución organizadora es obligatoria.";
+    } else if (newEvent.organiza.length > 100) {
+      newErrors.organiza =
+        "La institución organizadora no puede exceder los 100 caracteres.";
     }
 
+    // Validación de categoría
     const validCategories = [
       "Artes y diseño",
       "Música y teatro",
@@ -123,6 +166,7 @@ function EventDialog({
       newErrors.categoria = "Seleccione una categoría válida.";
     }
 
+    // Validación de precio
     if (
       newEvent.precio === undefined ||
       newEvent.precio === null ||
@@ -134,6 +178,7 @@ function EventDialog({
         "El precio debe ser -1 (Consultar) o un número no negativo.";
     }
 
+    // Validación de afiche
     if (!isEditing && (!newEvent.afiche || newEvent.afiche.length === 0)) {
       newErrors.afiche = "Al menos un afiche es obligatorio.";
     } else if (!isEditing && newEvent.afiche) {
@@ -152,40 +197,55 @@ function EventDialog({
       newErrors.afiche = "Al menos un afiche es obligatorio en modo edición.";
     }
 
+    // Validación de responsable
     if (
       !newEvent.persona ||
       typeof newEvent.persona !== "string" ||
       newEvent.persona.trim() === ""
     ) {
       newErrors.persona = "El nombre del responsable es obligatorio.";
+    } else if (newEvent.persona.length > 100) {
+      newErrors.persona =
+        "El nombre del responsable no puede exceder los 100 caracteres.";
     }
 
-    const phoneRegex = /^\+?[\d\s-]{8,}$/;
-    if (!newEvent.telefono || !phoneRegex.test(newEvent.telefono)) {
-      newErrors.telefono = "El teléfono es obligatorio y debe ser válido.";
+    // Validación de teléfono
+    const chileanPhoneRegex = /^\+56[9]\d{8}$/;
+    if (!newEvent.telefono || !chileanPhoneRegex.test(newEvent.telefono)) {
+      newErrors.telefono =
+        "El teléfono debe ser un número chileno válido con formato +569XXXXXXXX.";
     }
 
+    // Validación de correo
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!newEvent.correo || !emailRegex.test(newEvent.correo)) {
       newErrors.correo = "El correo es obligatorio y debe ser válido.";
+    } else if (newEvent.correo.length > 100) {
+      newErrors.correo = "El correo no puede exceder los 100 caracteres.";
     }
 
+    // Validación de enlace
     const urlRegex = /^(https?:\/\/)?[\w-]+(\.[\w-]+)+[/#?]?.*$/;
     if (!newEvent.link || !urlRegex.test(newEvent.link)) {
       newErrors.link = "El enlace es obligatorio y debe ser una URL válida.";
+    } else if (newEvent.link.length > 200) {
+      newErrors.link = "El enlace no puede exceder los 200 caracteres.";
     }
 
+    // Validación de edad
     const validAges = ["Todas las edades", "3+", "6+", "12+", "18+"];
     if (!newEvent.edad || !validAges.includes(newEvent.edad)) {
       newErrors.edad = "Seleccione una edad mínima válida.";
     }
 
+    // Validación de color
     const colorRegex = /^#[0-9A-Fa-f]{6}$/;
     if (!newEvent.color || !colorRegex.test(newEvent.color)) {
       newErrors.color =
         "El color debe ser un valor hexadecimal válido (ej. #RRGGBB).";
     }
 
+    // Validación de recurrencia
     const validRecurrences = ["None", "Daily", "Weekly", "Monthly"];
     if (
       !newEvent.recurrence ||
@@ -194,16 +254,11 @@ function EventDialog({
       newErrors.recurrence = "Seleccione una recurrencia válida.";
     }
 
+    // Validación de fecha de fin de recurrencia
     if (newEvent.recurrence !== "None") {
-      console.log("newEvent.date: " + newEvent.date);
-      console.log("newEvent.fechaFin: " + newEvent.fechaFin);
-      console.log(
-        " newEvent.date !== newEvent.fechaFin: " + newEvent.date !==
-          newEvent.fechaFin,
-      );
       if (newEvent.date.split("T")[0] !== newEvent.fechaFin.split("T")[0]) {
         newErrors.endRecurrenceDate =
-          "No puedes crear un evento recurrente que dure mas de un día";
+          "No puedes crear un evento recurrente que dure más de un día.";
       }
       if (
         !newEvent.endRecurrenceDate ||
@@ -257,7 +312,7 @@ function EventDialog({
         <div className="space-y-5">
           <div>
             <label className="block text-sm font-medium text-gray-700 font-codec">
-              Nombre de la actividad *
+              Nombre de la actividad * (máx. 100 caracteres)
             </label>
             <input
               readOnly={aprobado}
@@ -265,6 +320,7 @@ function EventDialog({
               name="title"
               value={newEvent.title || ""}
               onChange={handleInputChange}
+              maxLength={100}
               className="mt-1 block w-full border border-gray-300 rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500 font-codec"
             />
             {errors.title && (
@@ -276,7 +332,7 @@ function EventDialog({
               Color *
             </label>
             <input
-              readOnly={aprobado}
+              disabled={aprobado}
               type="color"
               name="color"
               value={newEvent.color || "#f9a8d4"}
@@ -361,23 +417,27 @@ function EventDialog({
           )}
           <div>
             <label className="block text-sm font-medium text-gray-700 font-codec">
-              Descripción *
+              Descripción * (máx. 700 caracteres)
             </label>
             <textarea
               readOnly={aprobado}
               name="description"
               value={newEvent.description || ""}
               onChange={handleInputChange}
+              maxLength={700}
               className="mt-1 block w-full border border-gray-300 rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500 font-codec"
               rows="4"
             />
+            <p className="text-sm text-gray-500 mt-1">
+              {newEvent.description ? newEvent.description.length : 0}/700
+            </p>
             {errors.description && (
               <p className="text-red-500 text-xs mt-1">{errors.description}</p>
             )}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 font-codec">
-              Dirección *
+              Dirección * (máx. 200 caracteres)
             </label>
             <input
               readOnly={aprobado}
@@ -385,6 +445,7 @@ function EventDialog({
               name="direccion"
               value={newEvent.direccion || ""}
               onChange={handleInputChange}
+              maxLength={200}
               className="mt-1 block w-full border border-gray-300 rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500 font-codec"
             />
             {errors.direccion && (
@@ -396,7 +457,7 @@ function EventDialog({
               Afiche(s) *
             </label>
             <input
-              readOnly={aprobado}
+              disabled={aprobado}
               type="file"
               accept="image/jpeg,image/png,image/gif"
               multiple
@@ -438,7 +499,7 @@ function EventDialog({
                           onClick={() => handleDeleteAfiche(index)}
                           className="absolute top-0 right-0 bg-gray-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-gray-600"
                         >
-                          &times;
+                          ×
                         </button>
                       )}
                     </div>
@@ -449,7 +510,7 @@ function EventDialog({
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 font-codec">
-              Organiza *
+              Organiza * (máx. 100 caracteres)
             </label>
             <input
               readOnly={aprobado}
@@ -457,6 +518,7 @@ function EventDialog({
               name="organiza"
               value={newEvent.organiza || ""}
               onChange={handleInputChange}
+              maxLength={100}
               className="mt-1 block w-full border border-gray-300 rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500 font-codec"
             />
             {errors.organiza && (
@@ -512,7 +574,7 @@ function EventDialog({
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 font-codec">
-              Responsable *
+              Responsable * (máx. 100 caracteres)
             </label>
             <input
               readOnly={aprobado}
@@ -520,6 +582,7 @@ function EventDialog({
               name="persona"
               value={newEvent.persona || ""}
               onChange={handleInputChange}
+              maxLength={100}
               className="mt-1 block w-full border border-gray-300 rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500 font-codec"
             />
             {errors.persona && (
@@ -528,7 +591,7 @@ function EventDialog({
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 font-codec">
-              Teléfono *
+              Teléfono * (+569XXXXXXXX)
             </label>
             <input
               readOnly={aprobado}
@@ -536,7 +599,16 @@ function EventDialog({
               name="telefono"
               value={newEvent.telefono || ""}
               onChange={handleInputChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500 font-codec"
+              onInput={handlePhoneInput}
+              maxLength={12}
+              className={`mt-1 block w-full border ${
+                phoneValid === true
+                  ? "border-green-500"
+                  : phoneValid === false
+                    ? "border-red-500"
+                    : "border-gray-300"
+              } rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500 font-codec`}
+              placeholder="+56912345678"
             />
             {errors.telefono && (
               <p className="text-red-500 text-xs mt-1">{errors.telefono}</p>
@@ -544,7 +616,7 @@ function EventDialog({
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 font-codec">
-              Correo *
+              Correo * (máx. 100 caracteres)
             </label>
             <input
               readOnly={aprobado}
@@ -552,6 +624,7 @@ function EventDialog({
               name="correo"
               value={newEvent.correo || ""}
               onChange={handleInputChange}
+              maxLength={100}
               className="mt-1 block w-full border border-gray-300 rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500 font-codec"
             />
             {errors.correo && (
@@ -560,7 +633,7 @@ function EventDialog({
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 font-codec">
-              Enlace *
+              Enlace * (máx. 200 caracteres)
             </label>
             <input
               readOnly={aprobado}
@@ -568,6 +641,7 @@ function EventDialog({
               name="link"
               value={newEvent.link || ""}
               onChange={handleInputChange}
+              maxLength={200}
               className="mt-1 block w-full border border-gray-300 rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500 font-codec"
             />
             {errors.link && (

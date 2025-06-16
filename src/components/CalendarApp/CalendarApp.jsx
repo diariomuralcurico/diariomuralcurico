@@ -61,56 +61,48 @@ function CalendarApp({
     recurrenceDates: [],
   };
 
+  const isMobile = () => window.innerWidth <= 640;
+
   const [newEvent, setNewEvent] = useState(initialEventState);
   const [editingEvent, setEditingEvent] = useState(null);
+
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowDate = tomorrow.getDate();
 
   const tourSteps = [
     {
-      title: "¡Bienvenido al Calendario!",
-      message:
-        "Esta es tu herramienta para publicar actividades. Haz doble clic en cualquier día para agregar un evento. Será revisado por nosotros.",
+      title: "¡Selecciona un Día!",
+      message: isMobile()
+        ? "Toca dos veces el número de un día para ver las horas."
+        : "Haz doble clic en el número de un día para ver las horas.",
       target: ".calendar-day",
-      position: "bottom",
       action: {
         type: "doubleClick",
         target: `div[data-day="${tomorrowDate}"]`,
-        description: "Haz doble clic aquí para abrir la vista por horas",
+        description: isMobile()
+          ? "Tocaré dos veces en el número de mañana"
+          : "Haré doble clic en el número de mañana",
       },
     },
     {
-      title: "Explora la Vista por Horas",
-      message:
-        "En la vista por horas, puedes ver los eventos del día y agregar nuevos. Desplázate para ver un ejemplo de horario.",
-      target: ".hourly-view-container",
-      position: "right",
+      title: "Elige una Hora",
+      message: isMobile()
+        ? "Toca una hora para agregar un evento."
+        : "Haz clic en una hora para agregar un evento.",
+      target: ".hour-slot",
       action: {
-        type: "scroll",
-        target: ".hourly-view-container",
-        scrollTo: "14:00",
-        highlight: true,
-        description: "Desplázate para ver el horario de las 14:00",
-      },
-    },
-    {
-      title: "Clickea en botón de mas",
-      message: "Se abrirá el formulario del evento",
-      target: ".hourly-view-container",
-      position: "right",
-      action: {
-        type: "click",
+        type: "clickHour",
         target: `button[data-hour="14:00"]`,
-        description: "Haz doble clic aquí para abrir la vista por horas",
+        description: isMobile()
+          ? "Tocaré la hora 14:00"
+          : "Haré clic en la hora 14:00",
       },
     },
     {
-      title: "Crea un Evento",
-      message:
-        "Ahora, crea un evento rellenando el formulario. Te mostraremos cómo hacerlo.",
+      title: "Crea tu Evento",
+      message: "Rellena los detalles del evento y guárdalo.",
       target: null,
-      position: "center",
       action: {
         type: "fillForm",
         formData: {
@@ -119,7 +111,7 @@ function CalendarApp({
           time: "14:00",
           endTime: "15:00",
           fechaFin: new Date().toISOString().split("T")[0],
-          description: "Este es un evento de prueba para la guía.",
+          description: "Evento de prueba para la guía.",
           direccion: "Calle Ejemplo 123, Curicó",
           organiza: "Diario Mural Curicó",
           categoria: "Artes y diseño",
@@ -132,27 +124,18 @@ function CalendarApp({
           color: "#f9a8d4",
           recurrence: "None",
         },
-        description: "Mira cómo rellenamos un formulario de evento",
+        description:
+          "Rellenaré los campos con ejemplos para que puedas entender mejor cómo completarlos.",
       },
     },
     {
-      title: "Navega por los Meses",
-      message: "Usa los botones 'Anterior' y 'Siguiente' para cambiar de mes.",
-      target: ".month-nav",
-      position: "bottom",
-      action: null,
-    },
-    {
-      title: "¡Listo para Empezar!",
+      title: "Ultimos detalles",
       message:
-        "¡Explora y comienza a publicar tus eventos! Puedes cerrar esta guía ahora.",
+        "Cuando completes los datos y finalices el evento será enviado para revisión. Una vez aprobado, estará visible en la cartelera de actividades.",
       target: null,
-      position: "center",
       action: null,
     },
   ];
-
-  const isMobile = () => window.innerWidth <= 640;
 
   useEffect(() => {
     const hasSeenTour = localStorage.getItem(`tourSeen_${user?.uid}`);
@@ -164,12 +147,22 @@ function CalendarApp({
     }
   }, [user]);
 
+  const highlightElement = (element) => {
+    if (element) {
+      element.classList.add("tutorial-focus");
+      setTimeout(() => {
+        element.classList.remove("tutorial-focus");
+      }, 1000);
+    }
+  };
+
   const executeAction = (action) => {
     if (!action) return;
     let targetElement = document.querySelector(action.target);
     switch (action.type) {
       case "doubleClick":
         if (targetElement) {
+          highlightElement(targetElement);
           const event = new MouseEvent("dblclick", {
             bubbles: true,
             cancelable: true,
@@ -178,29 +171,21 @@ function CalendarApp({
           targetElement.dispatchEvent(event);
         }
         break;
-      case "click":
+      case "clickHour":
         if (targetElement) {
-          const event = new MouseEvent("click", {
-            bubbles: true,
-            cancelable: true,
-            view: window,
-          });
-          targetElement.dispatchEvent(event);
-        }
-        break;
-      case "scroll":
-        const scrollContainer = document.querySelector(action.target);
-        if (scrollContainer) {
-          const timeSlot = Array.from(
-            scrollContainer.querySelectorAll(".hour-slot"),
-          ).find((slot) => slot.dataset.time === action.scrollTo);
-          if (timeSlot) {
-            timeSlot.scrollIntoView({ behavior: "smooth", block: "center" });
-            if (action.highlight) {
-              timeSlot.classList.add("highlight");
-              setTimeout(() => timeSlot.classList.remove("highlight"), 3000);
+          setSelectedDateForHours(tomorrow);
+          setTimeout(() => {
+            const hourElement = document.querySelector(action.target);
+            if (hourElement) {
+              highlightElement(hourElement);
+              const clickEvent = new MouseEvent("click", {
+                bubbles: true,
+                cancelable: true,
+                view: window,
+              });
+              hourElement.dispatchEvent(clickEvent);
             }
-          }
+          }, 500);
         }
         break;
       case "fillForm":
@@ -210,7 +195,6 @@ function CalendarApp({
           date: action.formData.date,
           fechaFin: action.formData.fechaFin,
         });
-        setShowDialog(true);
         setEditingEvent(null);
         setSelectedDay(new Date(action.formData.date));
         break;
@@ -221,10 +205,8 @@ function CalendarApp({
 
   const handleTourNext = () => {
     if (tourStep < tourSteps.length - 1) {
+      executeAction(tourSteps[tourStep].action);
       setTourStep(tourStep + 1);
-      setShowDialog(false);
-      setShowHourlyModal(false);
-      executeAction(tourSteps[tourStep + 1].action);
     } else {
       setShowTour(false);
       setShowDialog(false);
@@ -247,7 +229,37 @@ function CalendarApp({
     const today = new Date();
     setSelectedDay(today);
     setSelectedDateForHours(today);
-    executeAction(tourSteps[0].action);
+    setTimeout(() => {
+      const tomorrowElement = document.querySelector(
+        `div[data-day="${tomorrowDate}"]`,
+      );
+      if (tomorrowElement) {
+        try {
+          tomorrowElement.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+            inline: "nearest",
+          });
+        } catch (e) {
+          console.warn("scrollIntoView no soportado, usando fallback:", e);
+          const calendarContainer =
+            tomorrowElement.closest(".max-w-5xl") ||
+            document.querySelector(".max-w-5xl");
+          if (calendarContainer) {
+            const offsetTop =
+              tomorrowElement.getBoundingClientRect().top +
+              calendarContainer.scrollTop -
+              calendarContainer.getBoundingClientRect().top;
+            calendarContainer.scrollTo({
+              top: offsetTop,
+              behavior: "smooth",
+            });
+          }
+        }
+      } else {
+        console.warn("No se encontró el elemento del día de mañana.");
+      }
+    }, 300);
   };
 
   useEffect(() => {
@@ -303,6 +315,7 @@ function CalendarApp({
       setLoading(false);
       return;
     }
+
     const normalizeDateString = (input) => {
       if (!input) return "";
       if (input instanceof Date) {
@@ -324,16 +337,22 @@ function CalendarApp({
     const normalizedEndRecurrenceDate = normalizeDateString(
       newEvent.endRecurrenceDate,
     );
+
     const startDateStr = `${normalizedDate}T${newEvent.time || "00:00"}:00`;
     const endDateStr = `${normalizedFechaFin}T${newEvent.endTime || "23:59"}:59`;
-    const endRecurrenceDateStr = `${normalizedEndRecurrenceDate}T${newEvent.endTime || "23:59"}:59`;
+    const endRecurrenceDateStr = `${
+      normalizedEndRecurrenceDate
+    }T${newEvent.endTime || "23:59"}:59`;
+
     const startDate = new Date(startDateStr);
     const endRecurDate =
       newEvent.recurrence !== "None" && endRecurrenceDateStr
         ? new Date(endRecurrenceDateStr)
         : startDate;
     const endDate = new Date(endDateStr);
+
     let imageUrls = editingEvent ? [...(newEvent.afiche || [])] : [];
+
     if (
       newEvent.afiche &&
       newEvent.afiche.some((file) => file instanceof File)
@@ -381,17 +400,21 @@ function CalendarApp({
         return;
       }
     }
+
     const addDays = (date, days) => {
       const result = new Date(date);
       result.setDate(result.getDate() + days);
       return result;
     };
+
     const addWeeks = (date, weeks) => addDays(date, weeks * 7);
+
     const addMonths = (date, months) => {
       const result = new Date(date);
       result.setMonth(result.getMonth() + months);
       return result;
     };
+
     let recurrenceDates = [];
     if (newEvent.recurrence !== "None") {
       let currentDate = new Date(startDate);
@@ -418,6 +441,7 @@ function CalendarApp({
         }
       }
     }
+
     try {
       const eventsCollection = collection(db, "menu_test");
       const eventBase = {
@@ -450,6 +474,7 @@ function CalendarApp({
         aprobado: newEvent.aprobado || 0,
         createdBy: newEvent.createdBy || user.uid,
       };
+
       if (editingEvent) {
         const updatedEvent = {
           ...eventBase,
@@ -495,6 +520,7 @@ function CalendarApp({
         setEvents(updatedEvents);
         if (onEventChange) onEventChange(updatedEvents);
       }
+
       setShowDialog(false);
       const dialogCloseAnimationDuration = 300;
       setTimeout(() => {
@@ -535,23 +561,19 @@ function CalendarApp({
       edad: event.edad || "Todas las edades",
       color: event.color || "#f9a8d4",
       recurrence: event.recurrence || "None",
-      endRecurrenceDate: event.endRecurrenceDate
-        ? typeof event.endRecurrenceDate === "string"
-          ? event.endRecurrenceDate
-          : event.endRecurrenceDate.toDate().toISOString()
-        : "",
-      recurrenceDates: event.recurrenceDates || [],
+      endRecurrenceDate: null,
+      recurrenceDates: [],
     });
-    setEditingEvent({ ...event, docId: event.docId });
+    setEditingEvent({ ...event });
     setShowDialog(true);
   };
 
   const handleDayClick = (date) => {
-    setSelectedDay(date);
+    setSelectedDay(null);
     setNewEvent({
       ...initialEventState,
-      date: date.toISOString(),
-      fechaFin: date.toISOString(),
+      date: date.toISOString().split("T")[0],
+      fechaFin: date.toISOString().split("T")[0],
     });
     setShowDialog(true);
   };
@@ -562,14 +584,14 @@ function CalendarApp({
       ref={calendarRef}
     >
       <div className="flex justify-between items-center mb-4">
-        <h1
+        <h2
           className="text-3xl font-bold text-center text-gray-800 font-codec"
           style={{ display: "block" }}
         >
           Publica tu Actividad
-        </h1>
+        </h2>
         <button
-          className="bg-indigo-600 text-white font-codec text-sm px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors sm:text-base sm:px-6 sm:py-3"
+          className="modern-button font-codec"
           onClick={handleRestartTour}
           aria-label="Ver instrucciones de nuevo"
         >
@@ -612,7 +634,7 @@ function CalendarApp({
         onAdd={handleAddOrUpdateEvent}
         newEvent={newEvent}
         setNewEvent={setNewEvent}
-        selectedDate={selectedDay}
+        selectedDate={selectedDay ? new Date(selectedDay) : null}
         showTimeField={true}
         isEditing={!!editingEvent}
       />
