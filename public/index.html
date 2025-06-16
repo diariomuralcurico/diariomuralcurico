@@ -1,52 +1,79 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+    <head>
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
+        <meta charset="utf-8" />
+        <link rel="icon" href="/Favicon.png" />
 
-<head>
-  <meta charset="utf-8" />
-  <link rel="icon" href="/Favicon.png" />
-  
-	<!-- HTML Meta Tags -->
-  <title> Diario Mural Curicó |  Actividades y panoramas en tu ciudad</title>
-  <meta name="description" content="Descubre y publica actividades recreativas, eventos culturales 🎨, talleres 📚 y panoramas en Curicó 🏞️. Diario Mural Curicó es tu espacio comunitario 🗣️ para compartir todo lo que pasa en la ciudad.">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Facebook Meta Tags -->
-  <meta property="og:url" content="https://diariomuralcurico.cl">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Diario Mural Curicó |  Actividades y panoramas en tu ciudad">
-  <meta property="og:description" content="Descubre y publica actividades recreativas, eventos culturales 🎨, talleres 📚 y panoramas en Curicó 🏞️. Diario Mural Curicó es tu espacio comunitario 🗣️ para compartir todo lo que pasa en la ciudad.">
-  <meta property="og:image" content="https://opengraph.b-cdn.net/production/images/54776376-65f3-4043-97f3-276782f24f75.png?token=aWWWCTDIY_dRtZvHaoAC2ozgdKyQMCot5KMEMSRsrSs&height=630&width=1200&expires=33280559207">
-  
-  <!-- Twitter Meta Tags -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta property="twitter:domain" content="diariomuralcurico.cl">
-  <meta property="twitter:url" content="https://diariomuralcurico.cl">
-  <meta name="twitter:title" content="Diario Mural Curicó |  Actividades y panoramas en tu ciudad">
-  <meta name="twitter:description" content="Descubre y publica actividades recreativas, eventos culturales 🎨, talleres 📚 y panoramas en Curicó 🏞️. Diario Mural Curicó es tu espacio comunitario 🗣️ para compartir todo lo que pasa en la ciudad.">
-  <meta name="twitter:image" content="https://opengraph.b-cdn.net/production/images/54776376-65f3-4043-97f3-276782f24f75.png?token=aWWWCTDIY_dRtZvHaoAC2ozgdKyQMCot5KMEMSRsrSs&height=630&width=1200&expires=33280559207">
+        <!-- HTML Meta Tags -->
+        <title>
+            Diario Mural Curicó | Actividades y panoramas en tu ciudad
+        </title>
+        <meta
+            name="description"
+            content="Descubre y publica actividades recreativas, eventos culturales 🎨, talleres 📚 y panoramas en Curicó 🏞️. Diario Mural Curicó es tu espacio comunitario 🗣️ para compartir todo lo que pasa en la ciudad."
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <!-- Facebook Meta Tags -->
+        <meta property="og:url" content="https://diariomuralcurico.cl" />
+        <meta property="og:type" content="website" />
+        <meta
+            property="og:title"
+            content="Diario Mural Curicó |  Actividades y panoramas en tu ciudad"
+        />
+        <meta
+            property="og:description"
+            content="Descubre y publica actividades recreativas, eventos culturales 🎨, talleres 📚 y panoramas en Curicó 🏞️. Diario Mural Curicó es tu espacio comunitario 🗣️ para compartir todo lo que pasa en la ciudad."
+        />
+        <meta
+            property="og:image"
+            content="https://opengraph.b-cdn.net/production/images/54776376-65f3-4043-97f3-276782f24f75.png?token=aWWWCTDIY_dRtZvHaoAC2ozgdKyQMCot5KMEMSRsrSs&height=630&width=1200&expires=33280559207"
+        />
 
-  <link rel="icon" href="/Favicon.png" />
-  <link rel="manifest" href="/manifest.json" />
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous" />
+        <!-- Twitter Meta Tags -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta property="twitter:domain" content="diariomuralcurico.cl" />
+        <meta property="twitter:url" content="https://diariomuralcurico.cl" />
+        <meta
+            name="twitter:title"
+            content="Diario Mural Curicó |  Actividades y panoramas en tu ciudad"
+        />
+        <meta
+            name="twitter:description"
+            content="Descubre y publica actividades recreativas, eventos culturales 🎨, talleres 📚 y panoramas en Curicó 🏞️. Diario Mural Curicó es tu espacio comunitario 🗣️ para compartir todo lo que pasa en la ciudad."
+        />
+        <meta
+            name="twitter:image"
+            content="https://opengraph.b-cdn.net/production/images/54776376-65f3-4043-97f3-276782f24f75.png?token=aWWWCTDIY_dRtZvHaoAC2ozgdKyQMCot5KMEMSRsrSs&height=630&width=1200&expires=33280559207"
+        />
 
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "Diario Mural Curicó",
-        "url": "https://diariomuralcurico.cl",
-        "logo": "/Favicon.png"
-      }
-      </script>
+        <link rel="icon" href="/Favicon.png" />
+        <link rel="manifest" href="/manifest.json" />
+        <!-- Bootstrap CSS -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7"
+            crossorigin="anonymous"
+        />
 
-  <title>Diario Mural Curicó</title>
-</head>
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                "name": "Diario Mural Curicó",
+                "url": "https://diariomuralcurico.cl",
+                "logo": "/Favicon.png"
+            }
+        </script>
 
-<body>
+        <title>Diario Mural Curicó</title>
+    </head>
 
-  <div id="root"></div>
-
-</body>
-
+    <body>
+        <div id="root"></div>
+    </body>
 </html>

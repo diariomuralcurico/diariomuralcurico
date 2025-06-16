@@ -19,6 +19,7 @@ import {
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { Timestamp } from "firebase/firestore";
 import { BarLoader } from "react-spinners";
+import "./TourModal.css";
 
 function CalendarApp({
   user,
@@ -62,15 +63,13 @@ function CalendarApp({
 
   const [newEvent, setNewEvent] = useState(initialEventState);
   const [editingEvent, setEditingEvent] = useState(null);
-
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowDate = tomorrow.getDate();
 
-  // Tour steps with actions
   const tourSteps = [
     {
-      title: "¡Bienvenido a tu Calendario!",
+      title: "¡Bienvenido al Calendario!",
       message:
         "Esta es tu herramienta para publicar actividades. Haz doble clic en cualquier día para agregar un evento. Será revisado por nosotros.",
       target: ".calendar-day",
@@ -153,19 +152,18 @@ function CalendarApp({
     },
   ];
 
-  // Check if user has seen the tour
+  const isMobile = () => window.innerWidth <= 640;
+
   useEffect(() => {
     const hasSeenTour = localStorage.getItem(`tourSeen_${user?.uid}`);
     if (user?.uid && !hasSeenTour) {
       setShowTour(true);
-      // Select a day for the first step
       const today = new Date();
       setSelectedDay(today);
       setSelectedDateForHours(today);
     }
   }, [user]);
 
-  // Execute tour actions
   const executeAction = (action) => {
     if (!action) return;
     let targetElement = document.querySelector(action.target);
@@ -181,7 +179,6 @@ function CalendarApp({
         }
         break;
       case "click":
-        targetElement = document.querySelector(action.target);
         if (targetElement) {
           const event = new MouseEvent("click", {
             bubbles: true,
@@ -225,15 +222,14 @@ function CalendarApp({
   const handleTourNext = () => {
     if (tourStep < tourSteps.length - 1) {
       setTourStep(tourStep + 1);
-      // Close any open modals for clean transition
       setShowDialog(false);
       setShowHourlyModal(false);
-      executeAction(tourSteps[tourStep].action);
+      executeAction(tourSteps[tourStep + 1].action);
     } else {
       setShowTour(false);
       setShowDialog(false);
       setShowHourlyModal(false);
-      // localStorage.setItem(`tourSeen_${user?.uid}`, "true");
+      localStorage.setItem(`tourSeen_${user?.uid}`, "true");
     }
   };
 
@@ -241,7 +237,17 @@ function CalendarApp({
     setShowTour(false);
     setShowDialog(false);
     setShowHourlyModal(false);
-    // localStorage.setItem(`tourSeen_${user?.uid}`, "true");
+    localStorage.setItem(`tourSeen_${user?.uid}`, "true");
+  };
+
+  const handleRestartTour = () => {
+    localStorage.removeItem(`tourSeen_${user?.uid}`);
+    setTourStep(0);
+    setShowTour(true);
+    const today = new Date();
+    setSelectedDay(today);
+    setSelectedDateForHours(today);
+    executeAction(tourSteps[0].action);
   };
 
   useEffect(() => {
@@ -255,8 +261,8 @@ function CalendarApp({
         const fetchedEvents = eventsSnapshot.docs.map((doc) => {
           const data = doc.data();
           return {
-            createdBy: doc.createdBy,
-            aprobado: doc.aprobado,
+            createdBy: data.createdBy,
+            aprobado: data.aprobado,
             docId: doc.id,
             id: data.id || doc.id,
             ...data,
@@ -287,7 +293,7 @@ function CalendarApp({
       }
     };
     if (user?.uid) fetchEvents();
-  }, [user]);
+  }, [user, onEventChange]);
 
   const handleAddOrUpdateEvent = async (setErrors = () => {}) => {
     setLoading(true);
@@ -297,7 +303,6 @@ function CalendarApp({
       setLoading(false);
       return;
     }
-
     const normalizeDateString = (input) => {
       if (!input) return "";
       if (input instanceof Date) {
@@ -319,20 +324,16 @@ function CalendarApp({
     const normalizedEndRecurrenceDate = normalizeDateString(
       newEvent.endRecurrenceDate,
     );
-
     const startDateStr = `${normalizedDate}T${newEvent.time || "00:00"}:00`;
     const endDateStr = `${normalizedFechaFin}T${newEvent.endTime || "23:59"}:59`;
     const endRecurrenceDateStr = `${normalizedEndRecurrenceDate}T${newEvent.endTime || "23:59"}:59`;
-
     const startDate = new Date(startDateStr);
     const endRecurDate =
       newEvent.recurrence !== "None" && endRecurrenceDateStr
         ? new Date(endRecurrenceDateStr)
         : startDate;
     const endDate = new Date(endDateStr);
-
     let imageUrls = editingEvent ? [...(newEvent.afiche || [])] : [];
-
     if (
       newEvent.afiche &&
       newEvent.afiche.some((file) => file instanceof File)
@@ -342,16 +343,13 @@ function CalendarApp({
           newEvent.afiche
             .filter((file) => file instanceof File)
             .map(async (file) => {
-              // Opciones de compresión
               const compressionOptions = {
-                maxSizeMB: 1, // Máximo 1MB
-                maxWidthOrHeight: 1920, // Máxima resolución de 1920px
-                useWebWorker: true, // Usar Web Worker para no bloquear el hilo principal
+                maxSizeMB: 1,
+                maxWidthOrHeight: 1920,
+                useWebWorker: true,
               };
-
               let fileToUpload = file;
               try {
-                // Comprimir la imagen
                 fileToUpload = await imageCompression(file, compressionOptions);
                 console.log(
                   `Imagen comprimida: ${file.name}, tamaño original: ${
@@ -383,21 +381,17 @@ function CalendarApp({
         return;
       }
     }
-
     const addDays = (date, days) => {
       const result = new Date(date);
       result.setDate(result.getDate() + days);
       return result;
     };
-
     const addWeeks = (date, weeks) => addDays(date, weeks * 7);
-
     const addMonths = (date, months) => {
       const result = new Date(date);
       result.setMonth(result.getMonth() + months);
       return result;
     };
-
     let recurrenceDates = [];
     if (newEvent.recurrence !== "None") {
       let currentDate = new Date(startDate);
@@ -424,7 +418,6 @@ function CalendarApp({
         }
       }
     }
-
     try {
       const eventsCollection = collection(db, "menu_test");
       const eventBase = {
@@ -457,7 +450,6 @@ function CalendarApp({
         aprobado: newEvent.aprobado || 0,
         createdBy: newEvent.createdBy || user.uid,
       };
-
       if (editingEvent) {
         const updatedEvent = {
           ...eventBase,
@@ -503,7 +495,6 @@ function CalendarApp({
         setEvents(updatedEvents);
         if (onEventChange) onEventChange(updatedEvents);
       }
-
       setShowDialog(false);
       const dialogCloseAnimationDuration = 300;
       setTimeout(() => {
@@ -570,12 +561,21 @@ function CalendarApp({
       className={`max-w-5xl mx-auto p-4 sm:p-6 ${className}`}
       ref={calendarRef}
     >
-      <h1
-        className="text-3xl font-bold text-center mb-8 text-gray-800 font-codec"
-        style={{ display: "block", marginLeft: "auto", marginRight: "auto" }}
-      >
-        Publica tu Actividad
-      </h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1
+          className="text-3xl font-bold text-center text-gray-800 font-codec"
+          style={{ display: "block" }}
+        >
+          Publica tu Actividad
+        </h1>
+        <button
+          className="bg-indigo-600 text-white font-codec text-sm px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors sm:text-base sm:px-6 sm:py-3"
+          onClick={handleRestartTour}
+          aria-label="Ver instrucciones de nuevo"
+        >
+          Ver Instrucciones
+        </button>
+      </div>
       <CalendarView
         events={events}
         currentMonth={currentMonth}
