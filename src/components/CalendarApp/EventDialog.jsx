@@ -563,7 +563,7 @@ function EventDialog({
               readOnly={aprobado}
               type="number"
               name="precio"
-              value={newEvent.precio || ""}
+              value={newEvent.precio}
               onChange={handleInputChange}
               className="mt-1 block w-full border border-gray-300 rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500 font-codec"
               placeholder="Ingrese -1 para 'Consultar'"

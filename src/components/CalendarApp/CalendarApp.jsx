@@ -48,7 +48,7 @@ function CalendarApp({
     direccion: "",
     organiza: "",
     categoria: "Artes y diseño",
-    precio: "",
+    precio: 0,
     afiche: [],
     persona: "",
     telefono: "",
@@ -115,7 +115,7 @@ function CalendarApp({
           direccion: "Calle Ejemplo 123, Curicó",
           organiza: "Diario Mural Curicó",
           categoria: "Artes y diseño",
-          precio: "0",
+          precio: 0,
           persona: "Juan Pérez",
           telefono: "+56912345678",
           correo: "juan@ejemplo.com",
@@ -265,10 +265,17 @@ function CalendarApp({
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const q = query(
-          collection(db, "menu_test"),
-          or(where("createdBy", "==", user.uid), where("aprobado", "==", 1)),
-        );
+        let q;
+        if (user && user.uid) {
+          // User is logged in: fetch events created by user or approved
+          q = query(
+            collection(db, "menu_test"),
+            or(where("createdBy", "==", user.uid), where("aprobado", "==", 1)),
+          );
+        } else {
+          // User is not logged in: fetch only approved events
+          q = query(collection(db, "menu_test"), where("aprobado", "==", 1));
+        }
         const eventsSnapshot = await getDocs(q);
         const fetchedEvents = eventsSnapshot.docs.map((doc) => {
           const data = doc.data();
@@ -304,7 +311,7 @@ function CalendarApp({
         console.error("Error fetching events from Firestore:", error);
       }
     };
-    if (user?.uid) fetchEvents();
+    fetchEvents();
   }, [user, onEventChange]);
 
   const handleAddOrUpdateEvent = async (setErrors = () => {}) => {
@@ -453,7 +460,7 @@ function CalendarApp({
         direccion: newEvent.direccion,
         organiza: newEvent.organiza,
         categoria: newEvent.categoria,
-        precio: newEvent.precio === "-1" ? "Consultar" : newEvent.precio,
+        precio: newEvent.precio,
         afiche: imageUrls,
         persona: newEvent.persona,
         telefono: newEvent.telefono,
@@ -550,7 +557,7 @@ function CalendarApp({
       direccion: event.direccion || event.address || "",
       organiza: event.organiza || "",
       categoria: event.categoria || "Artes y diseño",
-      precio: event.precio === "Consultar" ? "-1" : event.precio || "",
+      precio: event.precio,
       afiche: Array.isArray(event.afiche)
         ? [...event.afiche]
         : [event.afiche].filter(Boolean),
