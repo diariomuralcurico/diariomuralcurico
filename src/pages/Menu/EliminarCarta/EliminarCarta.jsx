@@ -16,7 +16,7 @@ const EliminarCarta = () => {
   useEffect(() => {
     const getCard = async () => {
       try {
-        const collectionRef = collection(db, "menu_test");
+        const collectionRef = collection(db, "menu");
         const response = await getDocs(collectionRef);
 
         const docs = response.docs.map((doc) => {

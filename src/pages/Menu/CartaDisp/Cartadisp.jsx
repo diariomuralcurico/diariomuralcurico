@@ -19,10 +19,7 @@ const Cartadisp = () => {
   useEffect(() => {
     const getCard = async () => {
       try {
-        const q = query(
-          collection(db, "menu_test"),
-          where("aprobado", "==", 1),
-        );
+        const q = query(collection(db, "menu"), where("aprobado", "==", 1));
         const response = await getDocs(q);
         const docs = response.docs.map((doc) => {
           const data = doc.data();
@@ -57,7 +54,7 @@ const Cartadisp = () => {
 
   return (
     <div>
-<Modal
+      <Modal
         show={show}
         onHide={() => setShow(false)}
         dialogClassName="modal-90w"

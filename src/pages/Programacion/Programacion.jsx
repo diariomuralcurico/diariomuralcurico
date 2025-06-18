@@ -240,11 +240,11 @@ const Programacion = () => {
       let q;
       if (user && user.uid) {
         q = query(
-          collection(db, "menu_test"),
+          collection(db, "menu"),
           or(where("createdBy", "==", user.uid), where("aprobado", "==", 1)),
         );
       } else {
-        q = query(collection(db, "menu_test"), where("aprobado", "==", 1));
+        q = query(collection(db, "menu"), where("aprobado", "==", 1));
       }
       const response = await getDocs(q);
       const docs = response.docs.map((doc) => {

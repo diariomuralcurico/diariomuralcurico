@@ -1,19 +1,12 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import {
-  Card,
-  Col,
-  Row,
-  Button,
-  ListGroup,
-  Form,
-} from "react-bootstrap";
+import { Card, Col, Row, Button, ListGroup, Form } from "react-bootstrap";
 
-import { doc, deleteDoc, getFirestore,  } from "firebase/firestore";
+import { doc, deleteDoc, getFirestore } from "firebase/firestore";
 import { getStorage, ref, deleteObject } from "firebase/storage";
 import { BarLoader } from "react-spinners";
 
-import { Slide, ToastContainer, toast } from "react-toastify"; 
-import "react-toastify/dist/ReactToastify.css"; 
+import { Slide, ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import "dayjs/locale/es";
 
@@ -62,7 +55,7 @@ const EliminarCard = ({ menu, setMenu }) => {
 
   const menuOrdenadoFiltrado = useMemo(() => {
     return menuOrdenado.filter((plato) =>
-      categoriaSeleccionada ? plato.categoria === categoriaSeleccionada : true
+      categoriaSeleccionada ? plato.categoria === categoriaSeleccionada : true,
     );
   }, [menuOrdenado, categoriaSeleccionada]);
 
@@ -82,27 +75,27 @@ const EliminarCard = ({ menu, setMenu }) => {
     async (id) => {
       try {
         const db = getFirestore();
-        const storage = getStorage(); 
-  
-        const actividadRef = doc(db, "menu_test", id); 
-  
+        const storage = getStorage();
+
+        const actividadRef = doc(db, "menu", id);
+
         const imagenURL = menu.find((plato) => plato.id === id)?.afiche;
-  
+
         if (imagenURL) {
-          const imageRef = ref(storage, imagenURL); 
-          await deleteObject(imageRef); 
+          const imageRef = ref(storage, imagenURL);
+          await deleteObject(imageRef);
           console.log("Imagen eliminada con éxito.");
         }
-  
+
         // Eliminar el documento de Firestore
         await deleteDoc(actividadRef);
-  
+
         // Eliminar el evento de la lista en el estado local
         const updatedMenu = menu.filter((plato) => plato.id !== id);
         setMenu(updatedMenu);
-  
+
         // Mostrar un mensaje de éxito
-        toast.success('Actividad con éxito...', {
+        toast.success("Actividad con éxito...", {
           position: "top-center",
           autoClose: 5000,
           hideProgressBar: false,
@@ -114,7 +107,7 @@ const EliminarCard = ({ menu, setMenu }) => {
           transition: Slide,
         });
       } catch (error) {
-        toast.error('No se ha podido eliminar...', {
+        toast.error("No se ha podido eliminar...", {
           position: "top-center",
           autoClose: 5000,
           hideProgressBar: false,
@@ -125,11 +118,11 @@ const EliminarCard = ({ menu, setMenu }) => {
           theme: "light",
           transition: Slide,
         });
-  
+
         console.error("Error al eliminar el evento: ", error);
       }
     },
-    [menu, setMenu]
+    [menu, setMenu],
   );
 
   return (
@@ -142,8 +135,14 @@ const EliminarCard = ({ menu, setMenu }) => {
               sm={12}
               md={12}
               lg={12}
-              className="spinnerTarjeta d-flex flex-column justify-content-center align-items-center">
-              <BarLoader height={5} width={500} color="#9209db" loading={false} />
+              className="spinnerTarjeta d-flex flex-column justify-content-center align-items-center"
+            >
+              <BarLoader
+                height={5}
+                width={500}
+                color="#9209db"
+                loading={false}
+              />
               <p className="text-center fw-bold fs-5  mt-2">
                 Sin Actividades Disponibles
               </p>
@@ -159,7 +158,8 @@ const EliminarCard = ({ menu, setMenu }) => {
                     <Form.Select
                       className="mb-2"
                       onChange={handleFiltrarPorCategoria}
-                      value={categoriaSeleccionada}>
+                      value={categoriaSeleccionada}
+                    >
                       <option value="">Todas las categorías</option>
                       {categoriasUnicas.map((categoria, index) => (
                         <option key={index} value={categoria}>
@@ -169,7 +169,8 @@ const EliminarCard = ({ menu, setMenu }) => {
                     </Form.Select>
                     <Button
                       className="btnFilter fw-bold fs-5 m-1"
-                      onClick={toggleOrdenFecha}>
+                      onClick={toggleOrdenFecha}
+                    >
                       {ordenFecha === "asc"
                         ? " Actividades próximas ⬆️"
                         : "Actividades lejanas ⬇️"}
@@ -183,7 +184,8 @@ const EliminarCard = ({ menu, setMenu }) => {
                     {menuOrdenadoFiltrado.map((plato) => (
                       <Col
                         className="d-flex justify-content-center"
-                        key={plato.id}>
+                        key={plato.id}
+                      >
                         <Card className="text-center fixed-card shadow-sm ">
                           <div style={{ marginBottom: "10px" }}></div>
                           <Card.Img
@@ -201,7 +203,8 @@ const EliminarCard = ({ menu, setMenu }) => {
                             </p>
                             <Button
                               className="btnFilter fw-bold fs-5 mt-2"
-                              onClick={() => EliminarActividad(plato.id)}>
+                              onClick={() => EliminarActividad(plato.id)}
+                            >
                               Eliminar
                             </Button>
                           </Card.Body>

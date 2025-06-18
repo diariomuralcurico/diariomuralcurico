@@ -269,12 +269,12 @@ function CalendarApp({
         if (user && user.uid) {
           // User is logged in: fetch events created by user or approved
           q = query(
-            collection(db, "menu_test"),
+            collection(db, "menu"),
             or(where("createdBy", "==", user.uid), where("aprobado", "==", 1)),
           );
         } else {
           // User is not logged in: fetch only approved events
-          q = query(collection(db, "menu_test"), where("aprobado", "==", 1));
+          q = query(collection(db, "menu"), where("aprobado", "==", 1));
         }
         const eventsSnapshot = await getDocs(q);
         const fetchedEvents = eventsSnapshot.docs.map((doc) => {
@@ -450,7 +450,7 @@ function CalendarApp({
     }
 
     try {
-      const eventsCollection = collection(db, "menu_test");
+      const eventsCollection = collection(db, "menu");
       const eventBase = {
         id: `${startDate.toISOString()}-${Math.random()}`,
         nombre: newEvent.title,
@@ -488,7 +488,7 @@ function CalendarApp({
           fechaHoraActividad: Timestamp.fromDate(startDate),
           fechaHoraFinActividad: Timestamp.fromDate(endDate),
         };
-        await updateDoc(doc(db, "menu_test", editingEvent.docId), updatedEvent);
+        await updateDoc(doc(db, "menu", editingEvent.docId), updatedEvent);
         const updatedEvents = events.map((event) =>
           event.docId === editingEvent.docId
             ? {
