@@ -349,8 +349,8 @@ const Programacion = () => {
 
   const formatPrice = (precio) => {
     if (!precio) return "No especificado";
-    if (precio === 0) return "Gratis";
-    if (precio === -1) return "Consultar";
+    if (Number(precio) === 0) return "Gratis";
+    if (Number(precio) === -1) return "Consultar";
     return `$${precio.toLocaleString("es-CL", {
       style: "currency",
       currency: "CLP",

@@ -173,7 +173,7 @@ function EventDialog({
       isNaN(newEvent.precio)
     ) {
       newErrors.precio = "El precio es obligatorio.";
-    } else if (newEvent.precio !== -1 && newEvent.precio < 0) {
+    } else if (Number(newEvent.precio) !== -1 && Number(newEvent.precio) < 0) {
       newErrors.precio =
         "El precio debe ser -1 (Consultar) o un número no negativo.";
     }
