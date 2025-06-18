@@ -89,13 +89,8 @@ const Cartadisp = () => {
         </Modal.Header>
 
         <Modal.Body>
-<<<<<<< HEAD
           <p className="text-center modalBodyText">
             Escríbenos a{" "}
-=======
-          <p className="text-center fs-6 mb-0">
-            ¿Tienes dudas o sugerencias? Escríbenos a: <br />
->>>>>>> ffb52769efd657d6804910c634a4e2c85cb2bf26
             <a href="mailto:diariomuralcurico@gmail.com">
               diariomuralcurico@gmail.com
             </a>
