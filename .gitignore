@@ -5,9 +5,6 @@
 /.pnp
 .pnp.js
 
-# Variables de entorno
-.env
-
 # testing
 /coverage
 # firebase
