@@ -7,7 +7,7 @@ import Modal from "react-bootstrap/Modal";
 
 import { es } from "date-fns/locale";
 import { format } from "date-fns";
-import { Col, Container } from "react-bootstrap";
+import { Col, Container, Row } from "react-bootstrap";
 
 import Tarjeta from "../../../components/Tarjeta/Tarjeta/Tarjeta.jsx";
 
@@ -57,7 +57,7 @@ const Cartadisp = () => {
 
   return (
     <div>
-      <Modal
+<Modal
         show={show}
         onHide={() => setShow(false)}
         dialogClassName="modal-90w"
@@ -87,9 +87,15 @@ const Cartadisp = () => {
             </Container>
           </Modal.Title>
         </Modal.Header>
+
         <Modal.Body>
+<<<<<<< HEAD
           <p className="text-center modalBodyText">
             Escríbenos a{" "}
+=======
+          <p className="text-center fs-6 mb-0">
+            ¿Tienes dudas o sugerencias? Escríbenos a: <br />
+>>>>>>> ffb52769efd657d6804910c634a4e2c85cb2bf26
             <a href="mailto:diariomuralcurico@gmail.com">
               diariomuralcurico@gmail.com
             </a>
