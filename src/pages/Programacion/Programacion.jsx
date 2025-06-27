@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useEffect, useCallback } from "react";
 import { db } from "../../config/Firebase";
 import { collection, getDocs, query, where, or } from "firebase/firestore";
 import { useAuth } from "../../components/AuthContext";
 import { Modal, Button, Container } from "react-bootstrap";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
+import { DateTime } from "luxon";
 import "./Programacion.css";
 
 const globalImageCache = {};
@@ -15,10 +14,10 @@ const EventCarousel = ({
   eventId,
   onImageCacheUpdate,
 }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [loadedImages, setLoadedImages] = useState(new Set());
-  const [isNavigating, setIsNavigating] = useState(false);
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+  const [loading, setLoading] = React.useState(true);
+  const [loadedImages, setLoadedImages] = React.useState(new Set());
+  const [isNavigating, setIsNavigating] = React.useState(false);
 
   const images = React.useMemo(() => {
     const validImages = (rawImages || []).filter(
@@ -231,9 +230,9 @@ const EventCarousel = ({
 
 const Programacion = () => {
   const { user } = useAuth();
-  const [eventos, setEventos] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+  const [eventos, setEventos] = React.useState([]);
+  const [selectedEvent, setSelectedEvent] = React.useState(null);
+  const [showModal, setShowModal] = React.useState(false);
 
   const fetchEvents = useCallback(async () => {
     try {
@@ -247,43 +246,58 @@ const Programacion = () => {
         q = query(collection(db, "menu"), where("aprobado", "==", 1));
       }
       const response = await getDocs(q);
-      const docs = response.docs.map((doc) => {
-        const data = doc.data();
-        const afiche = data.afiche || [];
-        const images = [
-          ...new Set(
-            Array.isArray(afiche)
-              ? afiche.filter((img) => img && typeof img === "string")
-              : afiche && typeof afiche === "string"
-                ? [afiche]
-                : ["/images/default.jpg"],
-          ),
-        ];
-        return {
-          id: doc.id,
-          title: data.nombre,
-          start: data.fechaHoraActividad.toDate(),
-          end: data.fechaHoraFinActividad.toDate(),
-          description: data.descripcion,
-          address: data.direccion,
-          link: data.link,
-          image: images,
-          precio: data.precio,
-          categoria: data.categoria,
-          organiza: data.organiza,
-          persona: data.persona,
-          telefono: data.telefono,
-          correo: data.correo,
-          edad: data.edad,
-          color: data.color,
-          recurrence: data.recurrence,
-          endRecurrenceDate: data.endRecurrenceDate
-            ? data.endRecurrenceDate.toDate()
-            : null,
-          aprobado: data.aprobado,
-          createdBy: data.createdBy,
-        };
-      });
+      const docs = response.docs
+        .map((doc) => {
+          const data = doc.data();
+          if (!data.fechaHoraActividad || !data.fechaHoraFinActividad) {
+            console.warn(
+              `Evento con ID ${doc.id} tiene fechas inválidas`,
+              data,
+            );
+            return null;
+          }
+          const afiche = data.afiche || [];
+          const images = [
+            ...new Set(
+              Array.isArray(afiche)
+                ? afiche.filter((img) => img && typeof img === "string")
+                : afiche && typeof afiche === "string"
+                  ? [afiche]
+                  : ["/images/default.jpg"],
+            ),
+          ];
+          return {
+            id: doc.id,
+            title: data.nombre,
+            start: DateTime.fromJSDate(data.fechaHoraActividad.toDate())
+              .setZone("America/Santiago")
+              .toJSDate(),
+            end: DateTime.fromJSDate(data.fechaHoraFinActividad.toDate())
+              .setZone("America/Santiago")
+              .toJSDate(),
+            description: data.descripcion,
+            address: data.direccion,
+            link: data.link,
+            image: images,
+            precio: data.precio,
+            categoria: data.categoria,
+            organiza: data.organiza,
+            persona: data.persona,
+            telefono: data.telefono,
+            correo: data.correo,
+            edad: data.edad,
+            color: data.color,
+            recurrence: data.recurrence,
+            endRecurrenceDate: data.endRecurrenceDate
+              ? DateTime.fromJSDate(data.endRecurrenceDate.toDate())
+                  .setZone("America/Santiago")
+                  .toJSDate()
+              : null,
+            aprobado: data.aprobado,
+            createdBy: data.createdBy,
+          };
+        })
+        .filter((doc) => doc !== null);
       setEventos(docs);
     } catch (error) {
       console.error("Error al obtener eventos:", error);
@@ -326,14 +340,17 @@ const Programacion = () => {
   const groupEventsByDay = useCallback(() => {
     const grouped = {};
     eventos.forEach((event) => {
-      const dateStr = format(event.start, "yyyy-MM-dd", { locale: es });
+      const dateStr = DateTime.fromJSDate(event.start, {
+        zone: "America/Santiago",
+      }).toFormat("yyyy-MM-dd");
       if (!grouped[dateStr]) {
         grouped[dateStr] = [];
       }
       grouped[dateStr].push(event);
     });
     return Object.entries(grouped).sort(
-      ([dateA], [dateB]) => new Date(dateA) - new Date(dateB),
+      ([dateA], [dateB]) =>
+        DateTime.fromISO(dateA).toMillis() - DateTime.fromISO(dateB).toMillis(),
     );
   }, [eventos]);
 
@@ -351,7 +368,7 @@ const Programacion = () => {
     if (!precio) return "No especificado";
     if (Number(precio) === 0) return "Gratis";
     if (Number(precio) === -1) return "Consultar";
-    return `$${precio.toLocaleString("es-CL", {
+    return `$${Number(precio).toLocaleString("es-CL", {
       style: "currency",
       currency: "CLP",
     })}`;
@@ -382,7 +399,18 @@ const Programacion = () => {
         groupedEvents.map(([date, events]) => (
           <div key={date} className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-700 font-codec mb-4 border-b-2 border-indigo-100 pb-2">
-              {format(new Date(date), "EEEE, d MMMM yyyy", { locale: es })}
+              {DateTime.fromISO(date, {
+                zone: "America/Santiago",
+                locale: "es-CL",
+              }).toLocaleString(
+                {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                },
+                { locale: "es-CL" },
+              )}
             </h2>
             <ul className="event-list">
               {events.map((event) => (
@@ -395,8 +423,15 @@ const Programacion = () => {
                     {event.title}
                   </span>
                   <span className="event-time text-gray-600 font-codec text-sm">
-                    {format(event.start, "HH:mm", { locale: es })} -{" "}
-                    {format(event.end, "HH:mm", { locale: es })}
+                    {DateTime.fromJSDate(event.start, {
+                      zone: "America/Santiago",
+                      locale: "es-CL",
+                    }).toFormat("HH:mm")}{" "}
+                    -{" "}
+                    {DateTime.fromJSDate(event.end, {
+                      zone: "America/Santiago",
+                      locale: "es-CL",
+                    }).toFormat("HH:mm")}
                   </span>
                 </li>
               ))}
@@ -441,20 +476,24 @@ const Programacion = () => {
                   </span>
                   <p className="event-detail-value">
                     {(() => {
-                      const startDate = new Date(selectedEvent.start);
-                      const endDate = new Date(selectedEvent.end);
-                      const startDateStr = format(startDate, "d MMMM yyyy", {
-                        locale: es,
+                      const startDate = DateTime.fromJSDate(
+                        selectedEvent.start,
+                        { zone: "America/Santiago", locale: "es-CL" },
+                      );
+                      const endDate = DateTime.fromJSDate(selectedEvent.end, {
+                        zone: "America/Santiago",
+                        locale: "es-CL",
                       });
-                      const endDateStr = format(endDate, "d MMMM yyyy", {
-                        locale: es,
-                      });
-                      const isMultiDay =
-                        startDate.toISOString().split("T")[0] !==
-                        endDate.toISOString().split("T")[0];
+                      const isMultiDay = !startDate.hasSame(endDate, "day");
                       return isMultiDay
-                        ? `${startDateStr} - ${endDateStr}`
-                        : startDateStr;
+                        ? `${startDate.toFormat("d 'de' MMMM")} - ${endDate.toFormat("d 'de' MMMM")}`
+                        : startDate.toLocaleString(
+                            {
+                              day: "numeric",
+                              month: "long",
+                            },
+                            { locale: "es-CL" },
+                          );
                     })()}
                   </p>
                 </div>
@@ -464,23 +503,19 @@ const Programacion = () => {
                   </span>
                   <p className="event-detail-value">
                     {(() => {
-                      const startDate = new Date(selectedEvent.start);
-                      const endDate = new Date(selectedEvent.end);
-                      const isMultiDay =
-                        startDate.toISOString().split("T")[0] !==
-                        endDate.toISOString().split("T")[0];
+                      const startDate = DateTime.fromJSDate(
+                        selectedEvent.start,
+                        { zone: "America/Santiago", locale: "es-CL" },
+                      );
+                      const endDate = DateTime.fromJSDate(selectedEvent.end, {
+                        zone: "America/Santiago",
+                        locale: "es-CL",
+                      });
+                      const isMultiDay = !startDate.hasSame(endDate, "day");
                       if (isMultiDay) {
-                        return `${format(startDate, "d MMMM yyyy HH:mm", { locale: es })} - ${format(
-                          endDate,
-                          "d MMMM yyyy HH:mm",
-                          { locale: es },
-                        )}`;
+                        return `${startDate.toFormat("d 'de' MMMM HH:mm")} - ${endDate.toFormat("d 'de' MMMM HH:mm")}`;
                       }
-                      return `${format(startDate, "HH:mm", { locale: es })} - ${format(
-                        endDate,
-                        "HH:mm",
-                        { locale: es },
-                      )}`;
+                      return `${startDate.toFormat("HH:mm")} - ${endDate.toFormat("HH:mm")}`;
                     })()}
                   </p>
                 </div>
@@ -593,10 +628,12 @@ const Programacion = () => {
                         <i className="fas fa-calendar-times"></i> Hasta
                       </span>
                       <p className="event-detail-value">
-                        {format(
-                          new Date(selectedEvent.endRecurrenceDate),
-                          "d MMMM yyyy",
-                          { locale: es },
+                        {DateTime.fromJSDate(selectedEvent.endRecurrenceDate, {
+                          zone: "America/Santiago",
+                          locale: "es-CL",
+                        }).toLocaleString(
+                          { day: "numeric", month: "long", year: "numeric" },
+                          { locale: "es-CL" },
                         )}
                       </p>
                     </div>

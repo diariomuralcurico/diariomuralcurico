@@ -1,5 +1,6 @@
 import imageCompression from "browser-image-compression";
 import React, { useState, useEffect, useRef } from "react";
+import { DateTime } from "luxon"; // Importar Luxon
 import CalendarView from "./CalendarView";
 import EventDialog from "./EventDialog";
 import HourlyViewModal from "./HourlyViewModal";
@@ -107,10 +108,10 @@ function CalendarApp({
         type: "fillForm",
         formData: {
           title: "Evento de Ejemplo",
-          date: new Date().toISOString().split("T")[0],
+          date: DateTime.now().setZone("America/Santiago").toISODate(),
           time: "14:00",
           endTime: "15:00",
-          fechaFin: new Date().toISOString().split("T")[0],
+          fechaFin: DateTime.now().setZone("America/Santiago").toISODate(),
           description: "Evento de prueba para la guía.",
           direccion: "Calle Ejemplo 123, Curicó",
           organiza: "Diario Mural Curicó",
@@ -129,9 +130,9 @@ function CalendarApp({
       },
     },
     {
-      title: "Ultimos detalles",
+      title: "Últimos detalles",
       message:
-        "Cuando completes los datos y finalices el evento será enviado para revisión. Una vez aprobado, estará visible en la cartelera de actividades.",
+        "Cuando completes los datos y finalices, el evento será enviado para revisión. Una vez aprobado, estará visible en la cartelera de actividades.",
       target: null,
       action: null,
     },
@@ -141,7 +142,7 @@ function CalendarApp({
     const hasSeenTour = localStorage.getItem(`tourSeen_${user?.uid}`);
     if (user?.uid && !hasSeenTour) {
       setShowTour(true);
-      const today = new Date();
+      const today = DateTime.now().setZone("America/Santiago").toJSDate();
       setSelectedDay(today);
       setSelectedDateForHours(today);
     }
@@ -196,7 +197,11 @@ function CalendarApp({
           fechaFin: action.formData.fechaFin,
         });
         setEditingEvent(null);
-        setSelectedDay(new Date(action.formData.date));
+        setSelectedDay(
+          DateTime.fromISO(action.formData.date, {
+            zone: "America/Santiago",
+          }).toJSDate(),
+        );
         break;
       default:
         console.warn("Unknown action type:", action.type);
@@ -226,7 +231,7 @@ function CalendarApp({
     localStorage.removeItem(`tourSeen_${user?.uid}`);
     setTourStep(0);
     setShowTour(true);
-    const today = new Date();
+    const today = DateTime.now().setZone("America/Santiago").toJSDate();
     setSelectedDay(today);
     setSelectedDateForHours(today);
     setTimeout(() => {
@@ -267,32 +272,46 @@ function CalendarApp({
       try {
         let q;
         if (user && user.uid) {
-          // User is logged in: fetch events created by user or approved
           q = query(
             collection(db, "menu"),
             or(where("createdBy", "==", user.uid), where("aprobado", "==", 1)),
           );
         } else {
-          // User is not logged in: fetch only approved events
           q = query(collection(db, "menu"), where("aprobado", "==", 1));
         }
         const eventsSnapshot = await getDocs(q);
         const fetchedEvents = eventsSnapshot.docs.map((doc) => {
           const data = doc.data();
+          const fechaInicio = data.fechaHoraActividad?.toDate();
+          const fechaFin = data.fechaHoraFinActividad?.toDate();
+          const endRecurrence = data.endRecurrenceDate?.toDate();
+
           return {
             createdBy: data.createdBy,
             aprobado: data.aprobado,
             docId: doc.id,
             id: data.id || doc.id,
             ...data,
-            date: data.fechaHoraActividad?.toDate().toISOString(),
-            fechaFin: data.fechaHoraFinActividad?.toDate().toISOString(),
-            endRecurrenceDate: data.endRecurrenceDate
-              ? data.endRecurrenceDate.toDate().toISOString()
+            date: fechaInicio
+              ? DateTime.fromJSDate(fechaInicio)
+                  .setZone("America/Santiago")
+                  .toISO({ suppressMilliseconds: true })
+              : null,
+            fechaFin: fechaFin
+              ? DateTime.fromJSDate(fechaFin)
+                  .setZone("America/Santiago")
+                  .toISO({ suppressMilliseconds: true })
+              : null,
+            endRecurrenceDate: endRecurrence
+              ? DateTime.fromJSDate(endRecurrence)
+                  .setZone("America/Santiago")
+                  .toISO({ suppressMilliseconds: true })
               : null,
             recurrenceDates: data.recurrenceDates
               ? data.recurrenceDates.map((timestamp) =>
-                  timestamp.toDate().toISOString(),
+                  DateTime.fromJSDate(timestamp.toDate())
+                    .setZone("America/Santiago")
+                    .toISO({ suppressMilliseconds: true }),
                 )
               : [],
             title: data.nombre,
@@ -306,6 +325,7 @@ function CalendarApp({
           };
         });
         setEvents(fetchedEvents);
+        console.table(fetchedEvents);
         if (onEventChange) onEventChange(fetchedEvents);
       } catch (error) {
         console.error("Error fetching events from Firestore:", error);
@@ -325,10 +345,6 @@ function CalendarApp({
 
     const normalizeDateString = (input) => {
       if (!input) return "";
-      if (input instanceof Date) {
-        if (isNaN(input.getTime())) return "";
-        return input.toISOString().split("T")[0];
-      }
       if (typeof input === "string") {
         const parts = input.split("T");
         if (parts[0] && /^\d{4}-\d{2}-\d{2}$/.test(parts[0])) {
@@ -347,16 +363,21 @@ function CalendarApp({
 
     const startDateStr = `${normalizedDate}T${newEvent.time || "00:00"}:00`;
     const endDateStr = `${normalizedFechaFin}T${newEvent.endTime || "23:59"}:59`;
-    const endRecurrenceDateStr = `${
-      normalizedEndRecurrenceDate
-    }T${newEvent.endTime || "23:59"}:59`;
+    const endRecurrenceDateStr = `${normalizedEndRecurrenceDate}T${newEvent.endTime || "23:59"}:59`;
 
-    const startDate = new Date(startDateStr);
+    // Convertir fechas a Luxon con zona horaria America/Santiago
+    const startDate = DateTime.fromISO(startDateStr, {
+      zone: "America/Santiago",
+    }).toJSDate();
+    const endDate = DateTime.fromISO(endDateStr, {
+      zone: "America/Santiago",
+    }).toJSDate();
     const endRecurDate =
-      newEvent.recurrence !== "None" && endRecurrenceDateStr
-        ? new Date(endRecurrenceDateStr)
+      newEvent.recurrence !== "None" && normalizedEndRecurrenceDate
+        ? DateTime.fromISO(endRecurrenceDateStr, {
+            zone: "America/Santiago",
+          }).toJSDate()
         : startDate;
-    const endDate = new Date(endDateStr);
 
     let imageUrls = editingEvent ? [...(newEvent.afiche || [])] : [];
 
@@ -409,24 +430,29 @@ function CalendarApp({
     }
 
     const addDays = (date, days) => {
-      const result = new Date(date);
-      result.setDate(result.getDate() + days);
-      return result;
+      return DateTime.fromJSDate(date)
+        .setZone("America/Santiago")
+        .plus({ days })
+        .toJSDate();
     };
 
     const addWeeks = (date, weeks) => addDays(date, weeks * 7);
 
     const addMonths = (date, months) => {
-      const result = new Date(date);
-      result.setMonth(result.getMonth() + months);
-      return result;
+      return DateTime.fromJSDate(date)
+        .setZone("America/Santiago")
+        .plus({ months })
+        .toJSDate();
     };
 
     let recurrenceDates = [];
     if (newEvent.recurrence !== "None") {
-      let currentDate = new Date(startDate);
-      while (currentDate <= endRecurDate) {
-        const dateStr = currentDate.toISOString().split("T")[0];
+      let currentDate =
+        DateTime.fromJSDate(startDate).setZone("America/Santiago");
+      const endRecur =
+        DateTime.fromJSDate(endRecurDate).setZone("America/Santiago");
+      while (currentDate <= endRecur) {
+        const dateStr = currentDate.toISODate();
         const startTime = newEvent.time
           ? `${dateStr}T${newEvent.time}:00`
           : `${dateStr}T00:00:00`;
@@ -434,15 +460,19 @@ function CalendarApp({
           ? `${dateStr}T${newEvent.endTime}:00`
           : `${dateStr}T23:59:59`;
         recurrenceDates.push({
-          start: new Date(startTime),
-          end: new Date(endTime),
+          start: DateTime.fromISO(startTime, {
+            zone: "America/Santiago",
+          }).toJSDate(),
+          end: DateTime.fromISO(endTime, {
+            zone: "America/Santiago",
+          }).toJSDate(),
         });
         if (newEvent.recurrence === "Daily") {
-          currentDate = addDays(currentDate, 1);
+          currentDate = currentDate.plus({ days: 1 });
         } else if (newEvent.recurrence === "Weekly") {
-          currentDate = addWeeks(currentDate, 1);
+          currentDate = currentDate.plus({ weeks: 1 });
         } else if (newEvent.recurrence === "Monthly") {
-          currentDate = addMonths(currentDate, 1);
+          currentDate = currentDate.plus({ months: 1 });
         } else {
           break;
         }
@@ -452,7 +482,7 @@ function CalendarApp({
     try {
       const eventsCollection = collection(db, "menu");
       const eventBase = {
-        id: `${startDate.toISOString()}-${Math.random()}`,
+        id: `${DateTime.fromJSDate(startDate).toISO()}-${Math.random()}`,
         nombre: newEvent.title,
         time: newEvent.time || null,
         endTime: newEvent.endTime || null,
@@ -494,13 +524,19 @@ function CalendarApp({
             ? {
                 ...event,
                 ...updatedEvent,
-                date: startDate.toISOString(),
-                fechaFin: endDate.toISOString(),
+                date: DateTime.fromJSDate(startDate)
+                  .setZone("America/Santiago")
+                  .toISO({ suppressMilliseconds: true }),
+                fechaFin: DateTime.fromJSDate(endDate)
+                  .setZone("America/Santiago")
+                  .toISO({ suppressMilliseconds: true }),
                 title: updatedEvent.nombre,
                 description: updatedEvent.descripcion,
                 direccion: updatedEvent.direccion,
                 recurrenceDates: updatedEvent.recurrenceDates.map((timestamp) =>
-                  timestamp.toDate().toISOString(),
+                  DateTime.fromJSDate(timestamp.toDate())
+                    .setZone("America/Santiago")
+                    .toISO({ suppressMilliseconds: true }),
                 ),
               }
             : event,
@@ -512,13 +548,19 @@ function CalendarApp({
         const newEventData = {
           ...eventBase,
           docId: docRef.id,
-          date: startDate.toISOString(),
-          fechaFin: endDate.toISOString(),
+          date: DateTime.fromJSDate(startDate)
+            .setZone("America/Santiago")
+            .toISO({ suppressMilliseconds: true }),
+          fechaFin: DateTime.fromJSDate(endDate)
+            .setZone("America/Santiago")
+            .toISO({ suppressMilliseconds: true }),
           title: eventBase.nombre,
           description: eventBase.descripcion,
           direccion: eventBase.direccion,
           recurrenceDates: eventBase.recurrenceDates.map((timestamp) =>
-            timestamp.toDate().toISOString(),
+            DateTime.fromJSDate(timestamp.toDate())
+              .setZone("America/Santiago")
+              .toISO({ suppressMilliseconds: true }),
           ),
         };
         const updatedEvents = [...events, newEventData].sort(
@@ -549,10 +591,20 @@ function CalendarApp({
     setNewEvent({
       aprobado: event.aprobado || 0,
       title: event.title || event.nombre || "",
-      date: event.date || "",
+      date: event.date
+        ? DateTime.fromISO(event.date, { zone: "America/Santiago" }).toISODate()
+        : "",
       time: eventOriginal.time || "",
       endTime: eventOriginal.endTime || "",
-      fechaFin: event.fechaFin || event.date || "",
+      fechaFin: event.fechaFin
+        ? DateTime.fromISO(event.fechaFin, {
+            zone: "America/Santiago",
+          }).toISODate()
+        : event.date
+          ? DateTime.fromISO(event.date, {
+              zone: "America/Santiago",
+            }).toISODate()
+          : "",
       description: event.description || event.descripcion || "",
       direccion: event.direccion || event.address || "",
       organiza: event.organiza || "",
@@ -568,8 +620,12 @@ function CalendarApp({
       edad: event.edad || "Todas las edades",
       color: event.color || "#f9a8d4",
       recurrence: event.recurrence || "None",
-      endRecurrenceDate: null,
-      recurrenceDates: [],
+      endRecurrenceDate: event.endRecurrenceDate
+        ? DateTime.fromISO(event.endRecurrenceDate, {
+            zone: "America/Santiago",
+          }).toISODate()
+        : "",
+      recurrenceDates: event.recurrenceDates || [],
     });
     setEditingEvent({ ...event });
     setShowDialog(true);
@@ -577,10 +633,13 @@ function CalendarApp({
 
   const handleDayClick = (date) => {
     setSelectedDay(null);
+    const dateStr = DateTime.fromJSDate(date)
+      .setZone("America/Santiago")
+      .toISODate();
     setNewEvent({
       ...initialEventState,
-      date: date.toISOString().split("T")[0],
-      fechaFin: date.toISOString().split("T")[0],
+      date: dateStr,
+      fechaFin: dateStr,
     });
     setShowDialog(true);
   };

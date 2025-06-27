@@ -1,4 +1,5 @@
 import React from "react";
+import { DateTime } from "luxon";
 import useEscapeKey from "./useEscapeKey";
 
 function HourlyViewModal({
@@ -19,58 +20,103 @@ function HourlyViewModal({
     (_, i) => `${String(i).padStart(2, "0")}:00`,
   );
 
-  const dateString = date ? date.toISOString().split("T")[0] : "";
+  const dateString = date
+    ? DateTime.fromJSDate(date, { zone: "America/Santiago" }).toISODate()
+    : "";
 
-  // Filter events to include multi-day events that span the selected date
+  // Filter events to include only those that occur on the selected date
   const dayEvents = events
     .filter((event) => {
-      if (!event.date || !event.fechaFin) return false;
-      const eventStartDate = new Date(event.date);
-      const eventEndDate = new Date(event.fechaFin);
-      const currentDate = new Date(date).setHours(0, 0, 0, 0);
-      const eventStart = eventStartDate.setHours(0, 0, 0, 0);
-      const eventEnd = eventEndDate.setHours(23, 59, 59, 999);
-      if (event.recurrence === "None") {
-        return currentDate >= eventStart && currentDate <= eventEnd;
+      if (!event.date || !event.fechaFin) {
+        console.warn(`Evento con ID ${event.id} tiene fechas inválidas`, event);
+        return false;
       }
+
+      const eventStart = DateTime.fromISO(event.date, {
+        zone: "America/Santiago",
+      });
+      const eventEnd = DateTime.fromISO(event.fechaFin, {
+        zone: "America/Santiago",
+      });
+      const currentDate = DateTime.fromJSDate(date, {
+        zone: "America/Santiago",
+      }).startOf("day");
+
+      if (event.recurrence === "None") {
+        // For non-recurring events, check if the selected date is within the event's start and end
+        return (
+          currentDate >= eventStart.startOf("day") &&
+          currentDate <= eventEnd.startOf("day")
+        );
+      }
+
+      // For recurring events, check if the selected date matches any recurrence date
       return event.recurrenceDates.some((recDate) => {
-        const recurrenceDate = new Date(recDate).setHours(0, 0, 0, 0);
-        return recurrenceDate === currentDate;
+        const recurrenceDate = DateTime.fromISO(recDate, {
+          zone: "America/Santiago",
+        });
+        return recurrenceDate.hasSame(currentDate, "day");
       });
     })
     .map((event) => {
-      const eventStartDate = new Date(event.date);
-      const eventEndDate = new Date(event.fechaFin);
-      const selectedDate = new Date(date);
+      const eventStart = DateTime.fromISO(event.date, {
+        zone: "America/Santiago",
+      });
+      const eventEnd = DateTime.fromISO(event.fechaFin, {
+        zone: "America/Santiago",
+      });
+      const selectedDate = DateTime.fromJSDate(date, {
+        zone: "America/Santiago",
+      });
       let displayTime = event.time || "00:00";
       let displayEndTime = event.endTime || "23:59";
+
       if (event.recurrence === "None") {
-        const isFirstDay =
-          eventStartDate.toISOString().split("T")[0] === dateString;
-        const isLastDay =
-          eventEndDate.toISOString().split("T")[0] === dateString;
-        if (!isFirstDay) {
+        const isSameDay = eventStart.hasSame(eventEnd, "day");
+        const isSelectedDateStart = eventStart.hasSame(selectedDate, "day");
+        const isSelectedDateEnd = eventEnd.hasSame(selectedDate, "day");
+
+        if (isSameDay && isSelectedDateStart) {
+          // Single-day event: use exact times
+          displayTime = event.time || "00:00";
+          displayEndTime = event.endTime || "23:59";
+        } else if (isSelectedDateStart) {
+          // First day of multi-day event: use event.time for start
+          displayTime = event.time || "00:00";
+          displayEndTime = "23:59";
+        } else if (isSelectedDateEnd) {
+          // Last day of multi-day event: start at 00:00, end at event.endTime
           displayTime = "00:00";
-        }
-        if (!isLastDay) {
+          displayEndTime = event.endTime || "23:59";
+        } else {
+          // Intermediate day of multi-day event: full day
+          displayTime = "00:00";
           displayEndTime = "23:59";
         }
       } else {
+        // For recurring events, find the matching recurrence date
         const matchingRecurrence = event.recurrenceDates.find((recDate) => {
-          const recDateObj = new Date(recDate);
-          return recDateObj.toISOString().split("T")[0] === dateString;
+          const recDateObj = DateTime.fromISO(recDate, {
+            zone: "America/Santiago",
+          });
+          return recDateObj.hasSame(selectedDate, "day");
         });
+
         if (matchingRecurrence) {
-          const recDateObj = new Date(matchingRecurrence);
-          displayTime = recDateObj.toTimeString().slice(0, 5);
-          const endDateObj = new Date(recDateObj);
-          const [hours, minutes] = event.endTime
-            ? event.endTime.split(":").map(Number)
-            : [23, 59];
-          endDateObj.setHours(hours, minutes);
-          displayEndTime = endDateObj.toTimeString().slice(0, 5);
+          const recDateObj = DateTime.fromISO(matchingRecurrence, {
+            zone: "America/Santiago",
+          });
+          displayTime = event.time || recDateObj.toFormat("HH:mm");
+          const endDateObj = event.endTime
+            ? recDateObj.set({
+                hour: parseInt(event.endTime.split(":")[0], 10),
+                minute: parseInt(event.endTime.split(":")[1], 10),
+              })
+            : recDateObj.set({ hour: 23, minute: 59 });
+          displayEndTime = endDateObj.toFormat("HH:mm");
         }
       }
+
       return {
         ...event,
         time: displayTime,
@@ -81,12 +127,15 @@ function HourlyViewModal({
   const openEventDialog = (hour) => {
     const startHour = parseInt(hour.split(":")[0], 10);
     const defaultEndHour = String(startHour + 1).padStart(2, "0") + ":00";
+    const selectedDate = DateTime.fromJSDate(date, {
+      zone: "America/Santiago",
+    });
     setNewEvent({
       title: "",
-      date: date.toISOString(),
+      date: selectedDate.toISO(),
       time: hour,
       endTime: defaultEndHour > "24:00" ? "23:59" : defaultEndHour,
-      fechaFin: date.toISOString(),
+      fechaFin: selectedDate.toISO(),
       description: "",
       direccion: "",
       organiza: "",
@@ -167,12 +216,9 @@ function HourlyViewModal({
           <h2 className="text-2xl font-semibold text-center text-gray-800 font-codec">
             Eventos del{" "}
             {date
-              ? date.toLocaleDateString("es-CL", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })
+              ? DateTime.fromJSDate(date, {
+                  zone: "America/Santiago",
+                }).toLocaleString(DateTime.DATE_FULL, { locale: "es-CL" })
               : ""}
           </h2>
         </div>
@@ -232,11 +278,29 @@ function HourlyViewModal({
                     backgroundColor: event.color,
                   }}
                   onClick={() => handleEditEvent(event)}
+                  title={`${event.title} (${DateTime.fromISO(event.date, {
+                    zone: "America/Santiago",
+                  }).toFormat("dd/MM/yyyy HH:mm")} - ${DateTime.fromISO(
+                    event.fechaFin,
+                    { zone: "America/Santiago" },
+                  ).toFormat("dd/MM/yyyy HH:mm")})`}
                 >
                   <span className="font-medium">{event.title}</span>
                   <br />
                   <span className="text-xs">
                     {event.time} - {event.endTime}
+                  </span>
+                  <br />
+                  <span className="text-xs opacity-70">
+                    (
+                    {DateTime.fromISO(event.date, {
+                      zone: "America/Santiago",
+                    }).toFormat("dd/MM/yyyy")}{" "}
+                    -{" "}
+                    {DateTime.fromISO(event.fechaFin, {
+                      zone: "America/Santiago",
+                    }).toFormat("dd/MM/yyyy")}
+                    )
                   </span>
                 </div>
               );

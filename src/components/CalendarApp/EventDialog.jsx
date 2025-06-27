@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import useEscapeKey from "./useEscapeKey";
+import { DateTime } from "luxon";
 
 function EventDialog({
   show,
@@ -284,12 +285,7 @@ function EventDialog({
 
   const formatDateForInput = (date) => {
     if (!date) return "";
-    const d = new Date(date);
-    if (isNaN(d.getTime())) return "";
-    const year = d.getUTCFullYear();
-    const month = String(d.getUTCMonth() + 1).padStart(2, "0");
-    const day = String(d.getUTCDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+    return DateTime.fromISO(date, { zone: "America/Santiago" }).toISODate();
   };
 
   const aprobado = newEvent.aprobado === 1;
