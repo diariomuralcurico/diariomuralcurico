@@ -81,9 +81,6 @@ function CalendarApp({
       action: {
         type: "doubleClick",
         target: `div[data-day="${tomorrowDate}"]`,
-        description: isMobile()
-          ? "Tocaré dos veces en el número de mañana"
-          : "Haré doble clic en el número de mañana",
       },
     },
     {
@@ -95,9 +92,6 @@ function CalendarApp({
       action: {
         type: "clickHour",
         target: `button[data-hour="14:00"]`,
-        description: isMobile()
-          ? "Tocaré la hora 14:00"
-          : "Haré clic en la hora 14:00",
       },
     },
     {
@@ -125,8 +119,6 @@ function CalendarApp({
           color: "#f9a8d4",
           recurrence: "None",
         },
-        description:
-          "Rellenaré los campos con ejemplos para que puedas entender mejor cómo completarlos.",
       },
     },
     {
@@ -579,7 +571,7 @@ function CalendarApp({
     } catch (error) {
       console.error("Error saving event to Firestore:", error);
       setErrors({
-        general: "Error al guardar el evento. Por favor, intenta de nuevo.",
+        general: "Error al Guardar el evento. Por favor, intenta de nuevo.",
       });
     } finally {
       setLoading(false);

@@ -245,7 +245,7 @@ function HourlyViewModal({
                   onClick={() => openEventDialog(hour)}
                   className="absolute right-1 top-1 w-6 h-6 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-full hover:bg-indigo-200 transition duration-200 text-xs z-30 font-codec"
                   style={{ left: `calc(${timeLabelWidth} + 4px)` }}
-                  title={`Agregar Evento a las ${hour}`}
+                  title={`Guardar Evento a las ${hour}`}
                 >
                   +
                 </button>

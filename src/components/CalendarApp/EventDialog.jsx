@@ -161,6 +161,8 @@ function EventDialog({
       "Deportes y aire libre",
       "Ferias y exposiciones",
       "Fiestas y celebraciones",
+      "Ocio y pasatiempos",
+      "Talleres, concursos",
       "Otros",
     ];
     if (!newEvent.categoria || !validCategories.includes(newEvent.categoria)) {
@@ -212,15 +214,14 @@ function EventDialog({
 
     // Validación de teléfono
     const chileanPhoneRegex = /^\+56[9]\d{8}$/;
-    if (!newEvent.telefono || !chileanPhoneRegex.test(newEvent.telefono)) {
+    if (newEvent.telefono && !chileanPhoneRegex.test(newEvent.telefono)) {
       newErrors.telefono =
-        "El teléfono debe ser un número chileno válido con formato +569XXXXXXXX.";
+        "El teléfono es opcional pero debe ser un número chileno válido con formato +569XXXXXXXX.";
     }
-
     // Validación de correo
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!newEvent.correo || !emailRegex.test(newEvent.correo)) {
-      newErrors.correo = "El correo es obligatorio y debe ser válido.";
+    if (newEvent.correo && !emailRegex.test(newEvent.correo)) {
+      newErrors.correo = "El correo es opcional pero debe ser válido.";
     } else if (newEvent.correo.length > 100) {
       newErrors.correo = "El correo no puede exceder los 100 caracteres.";
     }
@@ -234,7 +235,7 @@ function EventDialog({
     }
 
     // Validación de edad
-    const validAges = ["Todas las edades", "3+", "6+", "12+", "18+"];
+    const validAges = ["Todas las edades", "+4", "+6", "+8", "+10", "+18"];
     if (!newEvent.edad || !validAges.includes(newEvent.edad)) {
       newErrors.edad = "Seleccione una edad mínima válida.";
     }
@@ -720,7 +721,7 @@ function EventDialog({
             onClick={handleSubmit}
             className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200 font-codec disabled:bg-gray-400"
           >
-            {isEditing ? "Actualizar" : "Agregar"}
+            {isEditing ? "Actualizar" : "Guardar"}
           </button>
         </div>
       </div>

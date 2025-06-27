@@ -430,17 +430,17 @@ const Programacion = () => {
   }, []);
 
   const formatPrice = (precio) => {
-    if (!precio) return "No especificado";
+    if (precio === undefined || precio === null) return null;
     if (Number(precio) === 0) return "Gratis";
     if (Number(precio) === -1) return "Consultar";
-    return `$${Number(precio).toLocaleString("es-CL", {
+    return `${Number(precio).toLocaleString("es-CL", {
       style: "currency",
       currency: "CLP",
     })}`;
   };
 
   const formatRecurrence = (recurrence) => {
-    if (!recurrence || recurrence === "None") return "No recurrente";
+    if (!recurrence || recurrence === "None") return null;
     return (
       recurrence.charAt(0).toUpperCase() + recurrence.slice(1).toLowerCase()
     )
@@ -527,14 +527,16 @@ const Programacion = () => {
             />
             <div className="event-details-container">
               <div className="event-detail-card">
-                <div className="event-detail-item">
-                  <span className="event-detail-label">
-                    <i className="fas fa-info-circle"></i> Descripción
-                  </span>
-                  <p className="event-detail-value">
-                    {selectedEvent.description || "No proporcionada"}
-                  </p>
-                </div>
+                {selectedEvent.description && (
+                  <div className="event-detail-item">
+                    <span className="event-detail-label">
+                      <i className="fas fa-info-circle"></i> Descripción
+                    </span>
+                    <p className="event-detail-value">
+                      {selectedEvent.description}
+                    </p>
+                  </div>
+                )}
                 <div className="event-detail-item">
                   <span className="event-detail-label">
                     <i className="fas fa-calendar-day"></i> Fecha
@@ -584,72 +586,85 @@ const Programacion = () => {
                     })()}
                   </p>
                 </div>
-                <div className="event-detail-item">
-                  <span className="event-detail-label">
-                    <i className="fas fa-map-marker-alt"></i> Ubicación
-                  </span>
-                  <p className="event-detail-value">
-                    {selectedEvent.address || "No especificada"}
-                  </p>
-                </div>
-                <div className="event-detail-item">
-                  <span className="event-detail-label">
-                    <i className="fas fa-ticket-alt"></i> Valor
-                  </span>
-                  <p className="event-detail-value">
-                    {formatPrice(selectedEvent.precio)}
-                  </p>
-                </div>
-                <div className="event-detail-item">
-                  <span className="event-detail-label">
-                    <i className="fas fa-tags"></i> Categoría
-                  </span>
-                  <p className="event-detail-value">
-                    {selectedEvent.categoria || "No especificada"}
-                  </p>
-                </div>
+                {selectedEvent.address && (
+                  <div className="event-detail-item">
+                    <span className="event-detail-label">
+                      <i className="fas fa-map-marker-alt"></i> Ubicación
+                    </span>
+                    <p className="event-detail-value">
+                      {selectedEvent.address}
+                    </p>
+                  </div>
+                )}
+                {selectedEvent.precio !== undefined &&
+                  selectedEvent.precio !== null && (
+                    <div className="event-detail-item">
+                      <span className="event-detail-label">
+                        <i className="fas fa-ticket-alt"></i> Valor
+                      </span>
+                      <p className="event-detail-value">
+                        {formatPrice(selectedEvent.precio)}
+                      </p>
+                    </div>
+                  )}
+                {selectedEvent.categoria && (
+                  <div className="event-detail-item">
+                    <span className="event-detail-label">
+                      <i className="fas fa-tags"></i> Categoría
+                    </span>
+                    <p className="event-detail-value">
+                      {selectedEvent.categoria}
+                    </p>
+                  </div>
+                )}
               </div>
               <div className="event-detail-card">
-                <div className="event-detail-item">
-                  <span className="event-detail-label">
-                    <i className="fas fa-users"></i> Organizador
-                  </span>
-                  <p className="event-detail-value">
-                    {selectedEvent.organiza || "No especificado"}
-                  </p>
-                </div>
-                <div className="event-detail-item">
-                  <span className="event-detail-label">
-                    <i className="fas fa-user"></i> Responsable
-                  </span>
-                  <p className="event-detail-value">
-                    {selectedEvent.persona || "No especificado"}
-                  </p>
-                </div>
-                <div className="event-detail-item">
-                  <span className="event-detail-label">
-                    <i className="fas fa-phone"></i> Teléfono
-                  </span>
-                  <p className="event-detail-value">
-                    {selectedEvent.telefono || "No proporcionado"}
-                  </p>
-                </div>
-                <div className="event-detail-item">
-                  <span className="event-detail-label">
-                    <i className="fas fa-envelope"></i> Correo
-                  </span>
-                  <p className="event-detail-value">
-                    {selectedEvent.correo || "No proporcionado"}
-                  </p>
-                </div>
-                <div className="event-detail-item">
-                  <span className="event-detail-label">
-                    <i className="fas fa-child"></i> Edad mínima
-                  </span>
-                  <p className="event-detail-value">
-                    {selectedEvent.edad || "Todas las edades"}
-                  </p>
-                </div>
+                {selectedEvent.organiza && (
+                  <div className="event-detail-item">
+                    <span className="event-detail-label">
+                      <i className="fas fa-users"></i> Organizador
+                    </span>
+                    <p className="event-detail-value">
+                      {selectedEvent.organiza}
+                    </p>
+                  </div>
+                )}
+                {selectedEvent.persona && (
+                  <div className="event-detail-item">
+                    <span className="event-detail-label">
+                      <i className="fas fa-user"></i> Responsable
+                    </span>
+                    <p className="event-detail-value">
+                      {selectedEvent.persona}
+                    </p>
+                  </div>
+                )}
+                {selectedEvent.telefono && (
+                  <div className="event-detail-item">
+                    <span className="event-detail-label">
+                      <i className="fas fa-phone"></i> Teléfono
+                    </span>
+                    <p className="event-detail-value">
+                      {selectedEvent.telefono}
+                    </p>
+                  </div>
+                )}
+                {selectedEvent.correo && (
+                  <div className="event-detail-item">
+                    <span className="event-detail-label">
+                      <i className="fas fa-envelope"></i> Correo
+                    </span>
+                    <p className="event-detail-value">{selectedEvent.correo}</p>
+                  </div>
+                )}
+                {selectedEvent.edad && (
+                  <div className="event-detail-item">
+                    <span className="event-detail-label">
+                      <i className="fas fa-child"></i> Edad mínima
+                    </span>
+                    <p className="event-detail-value">{selectedEvent.edad}</p>
+                  </div>
+                )}
                 <div className="event-detail-item">
                   <span className="event-detail-label">
                     <i className="fas fa-check-circle"></i> Estado
@@ -662,29 +677,31 @@ const Programacion = () => {
                 </div>
               </div>
               <div className="event-detail-card">
-                <div className="event-detail-item">
-                  <span className="event-detail-label">
-                    <i className="fas fa-redo"></i> Recurrencia
-                  </span>
-                  <p className="event-detail-value recurrence-value">
-                    <span
-                      className={`recurrence-badge ${
-                        selectedEvent.recurrence &&
-                        selectedEvent.recurrence !== "None"
-                          ? "recurrent"
-                          : "non-recurrent"
-                      }`}
-                      title={
-                        selectedEvent.recurrence &&
-                        selectedEvent.recurrence !== "None"
-                          ? "Este evento se repite regularmente"
-                          : "Este evento ocurre una sola vez"
-                      }
-                    >
-                      {formatRecurrence(selectedEvent.recurrence)}
+                {formatRecurrence(selectedEvent.recurrence) && (
+                  <div className="event-detail-item">
+                    <span className="event-detail-label">
+                      <i className="fas fa-redo"></i> Recurrencia
                     </span>
-                  </p>
-                </div>
+                    <p className="event-detail-value recurrence-value">
+                      <span
+                        className={`recurrence-badge ${
+                          selectedEvent.recurrence &&
+                          selectedEvent.recurrence !== "None"
+                            ? "recurrent"
+                            : "non-recurrent"
+                        }`}
+                        title={
+                          selectedEvent.recurrence &&
+                          selectedEvent.recurrence !== "None"
+                            ? "Este evento se repite regularmente"
+                            : "Este evento ocurre una sola vez"
+                        }
+                      >
+                        {formatRecurrence(selectedEvent.recurrence)}
+                      </span>
+                    </p>
+                  </div>
+                )}
                 {selectedEvent.recurrence &&
                   selectedEvent.recurrence !== "None" &&
                   selectedEvent.endRecurrenceDate && (
