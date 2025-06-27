@@ -35,6 +35,10 @@ const Navigation = () => {
             <Col xs="auto">
               <Navbar expand="lg" className="w-100">
                 <Container fluid>
+                  <Navbar.Toggle
+                    aria-controls="offcanvasNavbar-expand-sm"
+                    className="btnLink rounded fw-bold fs-6 m-1 p-2"
+                  />
                   <div className="d-flex btncontainer flex-grow-1 pe-2">
                     <Nav.Link
                       href="/programacion"
@@ -93,19 +97,13 @@ const Navigation = () => {
                             >
                               Iniciar Sesión
                             </Nav.Link>
-                            {/* <Nav.Link
-                              href="/register"
-                              className="btnLink rounded fw-bold fs-6 m-1 p-2"
-                            >
-                              Registrarse
-                            </Nav.Link> */}
                           </>
                         )}
                       </Nav>
                       <Row className="d-block d-lg-none align-items-center justify-content-center text-start mt-4">
                         <Col xs="auto">
                           <a
-                            href="https://www.instagram.com/diariomuralcurico"
+                            href="https://www.instagram.com/diariomuralcurico/"
                             target="_blank"
                             rel="noopener noreferrer"
                           >
