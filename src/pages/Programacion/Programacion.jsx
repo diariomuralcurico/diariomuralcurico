@@ -246,58 +246,122 @@ const Programacion = () => {
         q = query(collection(db, "menu"), where("aprobado", "==", 1));
       }
       const response = await getDocs(q);
-      const docs = response.docs
-        .map((doc) => {
-          const data = doc.data();
-          if (!data.fechaHoraActividad || !data.fechaHoraFinActividad) {
-            console.warn(
-              `Evento con ID ${doc.id} tiene fechas inválidas`,
-              data,
-            );
-            return null;
+      const todayStart = DateTime.now()
+        .setZone("America/Santiago")
+        .startOf("day");
+
+      const docs = [];
+      response.docs.forEach((doc) => {
+        const data = doc.data();
+        if (!data.fechaHoraActividad || !data.fechaHoraFinActividad) {
+          console.warn(`Evento con ID ${doc.id} tiene fechas inválidas`, data);
+          return;
+        }
+
+        const startDate = DateTime.fromJSDate(
+          data.fechaHoraActividad.toDate(),
+        ).setZone("America/Santiago");
+        const endDate = DateTime.fromJSDate(
+          data.fechaHoraFinActividad.toDate(),
+        ).setZone("America/Santiago");
+        const afiche = data.afiche || [];
+        const images = [
+          ...new Set(
+            Array.isArray(afiche)
+              ? afiche.filter((img) => img && typeof img === "string")
+              : afiche && typeof afiche === "string"
+                ? [afiche]
+                : ["/images/default.jpg"],
+          ),
+        ];
+
+        const baseEvent = {
+          id: doc.id,
+          title: data.nombre,
+          description: data.descripcion,
+          address: data.direccion,
+          link: data.link,
+          image: images,
+          precio: data.precio,
+          categoria: data.categoria,
+          organiza: data.organiza,
+          persona: data.persona,
+          telefono: data.telefono,
+          correo: data.correo,
+          edad: data.edad,
+          color: data.color,
+          recurrence: data.recurrence,
+          endRecurrenceDate: data.endRecurrenceDate
+            ? DateTime.fromJSDate(data.endRecurrenceDate.toDate())
+                .setZone("America/Santiago")
+                .toJSDate()
+            : null,
+          aprobado: data.aprobado,
+          createdBy: data.createdBy,
+        };
+
+        // Non-recurring events: include if start date is today or later
+        if (!data.recurrence || data.recurrence === "None") {
+          if (startDate >= todayStart) {
+            docs.push({
+              ...baseEvent,
+              start: startDate.toJSDate(),
+              end: endDate.toJSDate(),
+            });
           }
-          const afiche = data.afiche || [];
-          const images = [
-            ...new Set(
-              Array.isArray(afiche)
-                ? afiche.filter((img) => img && typeof img === "string")
-                : afiche && typeof afiche === "string"
-                  ? [afiche]
-                  : ["/images/default.jpg"],
-            ),
-          ];
-          return {
-            id: doc.id,
-            title: data.nombre,
-            start: DateTime.fromJSDate(data.fechaHoraActividad.toDate())
-              .setZone("America/Santiago")
-              .toJSDate(),
-            end: DateTime.fromJSDate(data.fechaHoraFinActividad.toDate())
-              .setZone("America/Santiago")
-              .toJSDate(),
-            description: data.descripcion,
-            address: data.direccion,
-            link: data.link,
-            image: images,
-            precio: data.precio,
-            categoria: data.categoria,
-            organiza: data.organiza,
-            persona: data.persona,
-            telefono: data.telefono,
-            correo: data.correo,
-            edad: data.edad,
-            color: data.color,
-            recurrence: data.recurrence,
-            endRecurrenceDate: data.endRecurrenceDate
-              ? DateTime.fromJSDate(data.endRecurrenceDate.toDate())
-                  .setZone("America/Santiago")
-                  .toJSDate()
-              : null,
-            aprobado: data.aprobado,
-            createdBy: data.createdBy,
-          };
-        })
-        .filter((doc) => doc !== null);
+          return;
+        }
+
+        // Recurring events: generate instances from startDate to endRecurrenceDate
+        if (
+          data.recurrence &&
+          data.recurrence !== "None" &&
+          data.endRecurrenceDate
+        ) {
+          const endRecurrence = DateTime.fromJSDate(
+            data.endRecurrenceDate.toDate(),
+          ).setZone("America/Santiago");
+          if (endRecurrence < todayStart) {
+            return;
+          }
+
+          let currentDate = startDate;
+          const eventDuration = endDate.diff(startDate).as("milliseconds");
+
+          while (currentDate <= endRecurrence) {
+            if (currentDate >= todayStart) {
+              const instanceStart = currentDate;
+              const instanceEnd = currentDate.plus({
+                milliseconds: eventDuration,
+              });
+              docs.push({
+                ...baseEvent,
+                id: `${doc.id}_${currentDate.toISODate()}`,
+                start: instanceStart.toJSDate(),
+                end: instanceEnd.toJSDate(),
+              });
+            }
+
+            switch (data.recurrence.toLowerCase()) {
+              case "daily":
+                currentDate = currentDate.plus({ days: 1 });
+                break;
+              case "weekly":
+                currentDate = currentDate.plus({ weeks: 1 });
+                break;
+              case "monthly":
+                currentDate = currentDate.plus({ months: 1 });
+                break;
+              default:
+                console.warn(
+                  `Recurrence type ${data.recurrence} not supported for event ${doc.id}`,
+                );
+                return;
+            }
+          }
+        }
+      });
+
       setEventos(docs);
     } catch (error) {
       console.error("Error al obtener eventos:", error);
@@ -342,6 +406,7 @@ const Programacion = () => {
     eventos.forEach((event) => {
       const dateStr = DateTime.fromJSDate(event.start, {
         zone: "America/Santiago",
+        locale: "es-CL",
       }).toFormat("yyyy-MM-dd");
       if (!grouped[dateStr]) {
         grouped[dateStr] = [];
