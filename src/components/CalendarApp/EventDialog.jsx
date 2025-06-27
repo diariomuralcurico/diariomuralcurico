@@ -650,17 +650,20 @@ function EventDialog({
               Edad mínima *
             </label>
             <select
+              disabled={aprobado}
               readOnly={aprobado}
               name="edad"
               value={newEvent.edad || "Todas las edades"}
               onChange={handleInputChange}
               className="mt-1 block w-full border border-gray-300 rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500 font-codec"
             >
-              {["Todas las edades", "3+", "6+", "12+", "18+"].map((age) => (
-                <option key={age} value={age}>
-                  {age}
-                </option>
-              ))}
+              {["Todas las edades", "+4", "+6", "+8", "+10", "+18"].map(
+                (age) => (
+                  <option key={age} value={age}>
+                    {age}
+                  </option>
+                ),
+              )}
             </select>
             {errors.edad && (
               <p className="text-red-500 text-xs mt-1">{errors.edad}</p>
@@ -671,6 +674,7 @@ function EventDialog({
               Repetición
             </label>
             <select
+              disabled={aprobado}
               readOnly={aprobado}
               name="recurrence"
               value={newEvent.recurrence || "None"}
@@ -693,6 +697,7 @@ function EventDialog({
                 Fecha de fin de repetición
               </label>
               <input
+                disabled={aprobado}
                 readOnly={aprobado}
                 type="date"
                 name="endRecurrenceDate"
