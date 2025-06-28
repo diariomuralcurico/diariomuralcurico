@@ -1,50 +1,233 @@
-
-
-p{
-    font-family: 'Codec-Pro-Light','Roboto', sans-serif;
-    
+/* Base typography */
+p {
+    font-family: "Codec-Pro-Light", "Roboto", sans-serif;
+    font-size: 1.125rem; /* Matches text-lg */
+    line-height: 1.625; /* Matches leading-relaxed */
+    color: #4b5563; /* Matches text-gray-700 */
 }
 
-h1 {
-    margin-bottom: 10px !important;
-    width: 70% !important;
-    color: tomato;
-  }
-  
-  h1:hover {
-    color: #724696;;
-  }
+/* Headings */
+h2 {
+    font-family: "Codec-Pro-Light", "Roboto", sans-serif;
+    font-weight: 700; /* Matches font-bold */
+    color: #111827; /* Matches text-gray-900 */
+    margin-bottom: 1.5rem; /* Matches mb-6 */
+    transition: color 0.3s ease;
+}
 
-.carousel-img{
-    height: 450px;
-    object-fit: contain; /* recorta y mantiene proporción */
+h2:hover {
+    color: #724696; /* Matches Navigation.css btnLink hover color */
+}
+
+/* Carousel container */
+.carousel-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    border-radius: 0; /* Full-screen effect */
+}
+
+/* Carousel wrapper */
+.carousel-wrapper {
+    width: 100%;
+    height: 100%;
+}
+
+/* Carousel images */
+.carousel-image {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
     object-position: center;
 }
 
-/* Para pantallas pequeñas: */
+/* Responsive carousel adjustments */
 @media (max-width: 768px) {
-    .carousel-img {
-      height: 350px;
+    .carousel-container {
+        height: 80vh;
     }
-  }
-  
-  /* Opcional: más compacto aún en móviles muy pequeños */
-  @media (max-width: 480px) {
-    .carousel-img {
-      height: 260px;
+    .carousel-image {
+        height: 80vh;
     }
-  }
-
-.imgAsupiciadores{
-    border-radius: 10%;
 }
 
-.imgAsupiciadores:hover{
-    transform: translateY(-8px) scale(1.05);
-    box-shadow: 0 8px 24px #ffffff;
+@media (max-width: 480px) {
+    .carousel-container {
+        height: 70vh;
+    }
+    .carousel-image {
+        height: 70vh;
+    }
 }
 
-.imgSecciones{
-  height: 260px;
+/* Section images (About Us, Description) */
+.img-secciones {
+    max-height: 400px; /* Consistent with desktop visibility */
+    width: 100%;
+    object-fit: cover;
+    border-radius: 1rem; /* Matches rounded-xl */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Matches shadow-md */
+}
 
+/* Sponsor images */
+.img-auspiciadores {
+    max-height: 200px; /* Larger for prominence */
+    width: auto;
+    max-width: 100%; /* Prevent overflow */
+    object-fit: contain; /* Preserve aspect ratio */
+    border-radius: 1rem; /* Matches rounded-xl */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Matches shadow-md */
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+/* Sponsor link */
+.sponsor-link {
+    display: block;
+    padding: 1.5rem; /* Increased for larger images */
+}
+
+/* Sponsor row */
+.sponsor-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem; /* Increased for larger images */
+    flex-wrap: nowrap; /* Force single row */
+}
+
+/* Sponsor column */
+.sponsor-row > .sponsor-col {
+    flex: 1;
+    max-width: 33.333%; /* Equal width for three columns */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Responsive sponsor adjustments */
+@media (max-width: 1024px) {
+    .img-auspiciadores {
+        max-height: 160px; /* Reduced for tablets */
+    }
+    .sponsor-row {
+        gap: 1.5rem;
+    }
+    .sponsor-link {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .img-auspiciadores {
+        max-height: 120px; /* Smaller for mobile */
+    }
+    .sponsor-row {
+        gap: 1rem;
+    }
+    .sponsor-link {
+        padding: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .img-auspiciadores {
+        max-height: 80px; /* Smallest for mobile */
+    }
+    .sponsor-row {
+        gap: 0.5rem;
+    }
+    .sponsor-link {
+        padding: 0.5rem;
+    }
+}
+
+/* Utility classes */
+.min-h-screen {
+    min-height: 100vh;
+}
+
+.bg-gray-50 {
+    background-color: #f9fafb; /* Matches Programacion.css */
+}
+
+.shadow-md {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+}
+
+.rounded-xl {
+    border-radius: 1rem;
+}
+
+.transition-transform {
+    transition: transform 0.3s ease;
+}
+
+.transition-shadow {
+    transition: box-shadow 0.3s ease;
+}
+
+.py-16 {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+}
+
+.mb-6 {
+    margin-bottom: 1.5rem;
+}
+
+.mb-12 {
+    margin-bottom: 3rem;
+}
+
+.mb-16 {
+    margin-bottom: 4rem;
+}
+
+.text-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+}
+
+.text-4xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+}
+
+.text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+}
+
+.text-gray-900 {
+    color: #111827;
+}
+
+.text-gray-700 {
+    color: #4b5563;
+}
+
+.text-indigo-600 {
+    color: #4f46e5; /* Matches Programacion.css */
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.leading-relaxed {
+    line-height: 1.625;
+}
+
+@media (min-width: 768px) {
+    .text-4xl {
+        font-size: 2.25rem;
+        line-height: 2.5rem;
+    }
 }
