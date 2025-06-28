@@ -527,6 +527,7 @@ function EventDialog({
               Categoría *
             </label>
             <select
+              disabled={aprobado}
               readOnly={aprobado}
               name="categoria"
               value={newEvent.categoria || "Artes y diseño"}

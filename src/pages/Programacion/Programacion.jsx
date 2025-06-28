@@ -1,9 +1,10 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import { db } from "../../config/Firebase";
 import { collection, getDocs, query, where, or } from "firebase/firestore";
 import { useAuth } from "../../components/AuthContext";
-import { Modal, Button, Container } from "react-bootstrap";
+import { Modal, Button, Container, Col } from "react-bootstrap";
 import { DateTime } from "luxon";
+import { BarLoader } from "react-spinners";
 import "./Programacion.css";
 
 const globalImageCache = {};
@@ -42,6 +43,7 @@ const EventCarousel = ({
       setIsNavigating(false);
       const img = new Image();
       img.src = images[index];
+      img.srcset = `${images[index]} 1x, ${images[index].replace(/(\.\w+)$/, "@2x$1")} 2x`;
       onImageCacheUpdate?.(cacheKey, images[index], {
         src: images[index],
         complete: true,
@@ -71,6 +73,7 @@ const EventCarousel = ({
       if (!cachedIndices.has(index)) {
         const image = new Image();
         image.src = img;
+        image.srcset = `${img} 1x, ${img.replace(/(\.\w+)$/, "@2x$1")} 2x`;
         image.onload = () => handleImageLoad(index);
         image.onerror = () => {
           console.error(`Failed to load image: ${img}`);
@@ -130,7 +133,8 @@ const EventCarousel = ({
         <img
           src="/imagenes/default.jpg"
           alt="Imagen por defecto"
-          className="w-full h-full max-w-md max-h-[400px] mx-auto rounded-lg object-cover"
+          className="w-full h-full max-w-[960px] max-h-[600px] mx-auto rounded-lg object-contain"
+          srcSet="/imagenes/default.jpg 1x, /imagenes/default@2x.jpg 2x"
         />
       </div>
     );
@@ -147,8 +151,9 @@ const EventCarousel = ({
         )}
         <img
           src={cachedImage.src || images[0]}
+          srcSet={`${cachedImage.src || images[0]} 1x, ${(cachedImage.src || images[0]).replace(/(\.\w+)$/, "@2x$1")} 2x`}
           alt="Imagen del evento"
-          className="w-full h-full max-w-md max-h-[400px] mx-auto rounded-lg object-cover"
+          className="w-full h-full max-w-[960px] max-h-[600px] mx-auto rounded-lg object-contain"
           onLoad={() => handleImageLoad(0)}
           onError={() => handleImageLoad(0)}
           style={{ opacity: loadedImages.has(0) ? 1 : 0 }}
@@ -183,6 +188,7 @@ const EventCarousel = ({
           >
             <img
               src={image}
+              srcSet={`${image} 1x, ${image.replace(/(\.\w+)$/, "@2x$1")} 2x`}
               alt={`Imagen ${index + 1} del evento`}
               className="carousel-image"
               onLoad={() => handleImageLoad(index)}
@@ -233,8 +239,10 @@ const Programacion = () => {
   const [eventos, setEventos] = React.useState([]);
   const [selectedEvent, setSelectedEvent] = React.useState(null);
   const [showModal, setShowModal] = React.useState(false);
+  const [loading, setLoading] = useState(true);
 
   const fetchEvents = useCallback(async () => {
+    setLoading(true);
     try {
       let q;
       if (user && user.uid) {
@@ -300,7 +308,6 @@ const Programacion = () => {
           createdBy: data.createdBy,
         };
 
-        // Non-recurring events: include if start date is today or later
         if (!data.recurrence || data.recurrence === "None") {
           if (startDate >= todayStart) {
             docs.push({
@@ -312,7 +319,6 @@ const Programacion = () => {
           return;
         }
 
-        // Recurring events: generate instances from startDate to endRecurrenceDate
         if (
           data.recurrence &&
           data.recurrence !== "None" &&
@@ -365,6 +371,8 @@ const Programacion = () => {
       setEventos(docs);
     } catch (error) {
       console.error("Error al obtener eventos:", error);
+    } finally {
+      setLoading(false);
     }
   }, [user]);
 
@@ -456,7 +464,21 @@ const Programacion = () => {
       <h2 className="agenda-title text-3xl font-semibold mb-10 font-codec text-gray-800 text-center">
         Agenda de Actividades
       </h2>
-      {groupedEvents.length === 0 ? (
+      {loading && (
+        <Col
+          xs={12}
+          sm={12}
+          md={12}
+          lg={12}
+          className="spinnerTarjeta d-flex flex-column justify-content-center align-items-center mb-10"
+        >
+          <BarLoader height={5} width={500} color="#9209db" />
+          <p className="text-center fw-bold fs-5 mt-2">
+            Cargando Actividades...
+          </p>
+        </Col>
+      )}
+      {groupedEvents.length === 0 && !loading ? (
         <p className="text-center text-gray-600 font-codec text-lg">
           No hay eventos disponibles.
         </p>
