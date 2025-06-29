@@ -291,7 +291,7 @@ function HourlyViewModal({
                     {event.time} - {event.endTime}
                   </span>
                   <br />
-                  <span className="text-xs opacity-70">
+                  {/* <span className="text-xs opacity-70">
                     (
                     {DateTime.fromISO(event.date, {
                       zone: "America/Santiago",
@@ -301,7 +301,7 @@ function HourlyViewModal({
                       zone: "America/Santiago",
                     }).toFormat("dd/MM/yyyy")}
                     )
-                  </span>
+                  </span> */}
                 </div>
               );
             })}
