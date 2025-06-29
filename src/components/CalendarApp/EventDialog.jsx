@@ -542,6 +542,8 @@ function EventDialog({
                 "Deportes y aire libre",
                 "Ferias y exposiciones",
                 "Fiestas y celebraciones",
+                "Ocio y pasatiempos",
+                "Talleres, concursos",
                 "Otros",
               ].map((cat) => (
                 <option key={cat} value={cat}>
