@@ -33,20 +33,20 @@ function CalendarView({
   const daysInMonth = lastDayOfMonth.getDate();
   const calendarRef = useRef(null);
   const touchStartX = useRef(null);
-  const [slideDirection, setSlideDirection] = useState(null); // Track animation direction
+  const touchStartY = useRef(null); // Nueva variable para coordenada Y
+  const [slideDirection, setSlideDirection] = useState(null);
 
   const prevMonth = (isSwipe = false) => {
     if (isSwipe) {
-      setSlideDirection("slide-right"); // Slide out to the right for previous month swipe
+      setSlideDirection("slide-right");
       setTimeout(() => {
         setCurrentMonth(
           new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1),
         );
-        setSlideDirection(null); // Reset animation
+        setSlideDirection(null);
         setSelectedDay(null);
-      }, 250); // Match the transition duration
+      }, 250);
     } else {
-      // No animation for button click
       setCurrentMonth(
         new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1),
       );
@@ -56,16 +56,15 @@ function CalendarView({
 
   const nextMonth = (isSwipe = false) => {
     if (isSwipe) {
-      setSlideDirection("slide-left"); // Slide out to the left for next month swipe
+      setSlideDirection("slide-left");
       setTimeout(() => {
         setCurrentMonth(
           new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1),
         );
-        setSlideDirection(null); // Reset animation
+        setSlideDirection(null);
         setSelectedDay(null);
-      }, 250); // Match the transition duration
+      }, 250);
     } else {
-      // No animation for button click
       setCurrentMonth(
         new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1),
       );
@@ -75,28 +74,41 @@ function CalendarView({
 
   const handleTouchStart = (e) => {
     touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY; // Capturar coordenada Y
   };
 
   const handleTouchEnd = (e) => {
-    if (touchStartX.current === null) return;
+    if (touchStartX.current === null || touchStartY.current === null) return;
 
     const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
     const deltaX = touchEndX - touchStartX.current;
-    const minSwipeDistance = 50; // Minimum swipe distance in pixels
+    const deltaY = touchEndY - touchStartY.current;
+    const minSwipeDistance = 50;
+    const maxVerticalMovement = 30;
 
-    if (deltaX > minSwipeDistance) {
-      prevMonth(true); // Swipe right: previous month with animation
-    } else if (deltaX < -minSwipeDistance) {
-      nextMonth(true); // Swipe left: next month with animation
+    if (
+      Math.abs(deltaX) > minSwipeDistance &&
+      Math.abs(deltaY) < maxVerticalMovement
+    ) {
+      if (deltaX > 0) {
+        prevMonth(true);
+      } else {
+        nextMonth(true);
+      }
     }
 
     touchStartX.current = null;
+    touchStartY.current = null;
   };
 
   const openHourlyView = (date) => {
     setSelectedDateForHours(date);
     setShowHourlyModal(true);
   };
+
+  // Resto del código de CalendarView.jsx sin cambios...
+  // (Incluye la lógica de days, eventSpans, timeToMinutes, etc.)
 
   const days = [];
   if (startDay === 0) {
