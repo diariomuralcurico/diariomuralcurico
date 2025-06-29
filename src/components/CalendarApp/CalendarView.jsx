@@ -102,12 +102,20 @@ function CalendarView({
   if (startDay === 0) {
     for (let i = 0; i < 6; i++) {
       days.push(
-        <div key={`empty-${i + 10}`} className="h-40 bg-gray-100"></div>,
+        <div
+          key={`empty-${i + 10}`}
+          className="h-24 max-sm:h-24 sm:h-40 !h-24 sm:!h-40 bg-gray-100"
+        ></div>,
       );
     }
   }
   for (let i = 1; i < startDay; i++) {
-    days.push(<div key={`empty-${i}`} className="h-40 bg-gray-100"></div>);
+    days.push(
+      <div
+        key={`empty-${i}`}
+        className="h-24 max-sm:h-24 sm:h-40 !h-24 sm:!h-40 bg-gray-100"
+      ></div>,
+    );
   }
 
   const eventSpans = events.flatMap((event) => {
@@ -168,14 +176,14 @@ function CalendarView({
     days.push(
       <div
         key={day}
-        className={`h-40 border p-2 relative cursor-pointer hover:bg-indigo-50 transition duration-200 calendar-day ${
+        className={`h-24 max-sm:h-24 sm:h-40 !h-24 sm:!h-40 border p-2 relative cursor-pointer hover:bg-indigo-50 transition duration-200 calendar-day ${
           isSelected ? "bg-indigo-100" : ""
         }`}
         onDoubleClick={() => openHourlyView(date)}
         data-day={day}
       >
         <span className="font-medium text-lg">{day}</span>
-        <div className="mt-1 h-[134px] overflow-hidden">
+        <div className="mt-1 h-[86px] max-sm:h-[86px] sm:h-[134px] !h-[86px] sm:!h-[134px] overflow-hidden">
           {dayEvents.slice(0, 4).map((event) => {
             const eventStart = new Date(event.segmentStart || event.date);
             const eventEnd = new Date(event.segmentEnd || event.fechaFin);
