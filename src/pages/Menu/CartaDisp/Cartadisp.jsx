@@ -5,9 +5,8 @@ import { db } from "../../../config/Firebase";
 
 import Modal from "react-bootstrap/Modal";
 
-import { es } from "date-fns/locale";
-import { format } from "date-fns";
 import { Col, Container, Row } from "react-bootstrap";
+import { DateTime } from "luxon";
 
 import Tarjeta from "../../../components/Tarjeta/Tarjeta/Tarjeta.jsx";
 
@@ -15,37 +14,124 @@ import "./Cartadisp.css";
 const Cartadisp = () => {
   const [show, setShow] = useState(true);
   const [menu, setMenu] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getCard = async () => {
+      setLoading(true);
       try {
         const q = query(collection(db, "menu"), where("aprobado", "==", 1));
         const response = await getDocs(q);
-        const docs = response.docs.map((doc) => {
+        const todayStart = DateTime.now()
+          .setZone("America/Santiago")
+          .startOf("day");
+
+        const docs = [];
+        response.docs.forEach((doc) => {
           const data = doc.data();
-          data.id = doc.id;
-          return data;
-        });
-
-        const approvedItems = docs.filter((item) => {
-          const now = new Date();
-          const fechaFin = item.fechaHoraFinActividad;
-
-          if (fechaFin && fechaFin.seconds) {
-            const fechaFinDate = new Date(fechaFin.seconds * 1000);
-            const fechaFormateada = format(fechaFinDate, "dd MMMM yyyy", {
-              local: es,
-            });
-            item.fechaFormateada = fechaFormateada;
-            return item.aprobado === 1 && fechaFinDate >= now;
+          const fechaHoraActividad = data.fechaHoraActividad;
+          const fechaHoraFinActividad = data.fechaHoraFinActividad;
+          if (!fechaHoraActividad || !fechaHoraFinActividad) {
+            return;
           }
-          return false;
+
+          const startDate = DateTime.fromJSDate(
+            data.fechaHoraActividad.toDate(),
+          ).setZone("America/Santiago");
+          const endDate = DateTime.fromJSDate(
+            data.fechaHoraFinActividad.toDate(),
+          ).setZone("America/Santiago");
+
+          const baseEvent = {
+            id: doc.id,
+            title: data.nombre,
+            description: data.descripcion,
+            address: data.direccion,
+            link: data.link,
+            image: data.afiche || [],
+            precio: data.precio,
+            categoria: data.categoria,
+            organiza: data.organiza,
+            persona: data.persona,
+            telefono: data.telefono,
+            correo: data.correo,
+            edad: data.edad,
+            color: data.color,
+            recurrence: data.recurrence,
+            endRecurrenceDate: data.endRecurrenceDate
+              ? DateTime.fromJSDate(data.endRecurrenceDate.toDate())
+                  .setZone("America/Santiago")
+                  .toJSDate()
+              : null,
+            aprobado: data.aprobado,
+            createdBy: data.createdBy,
+          };
+
+          if (!data.recurrence || data.recurrence === "None") {
+            if (startDate >= todayStart) {
+              docs.push({
+                ...baseEvent,
+                start: startDate.toJSDate(),
+                end: endDate.toJSDate(),
+              });
+            }
+            return;
+          }
+
+          if (
+            data.recurrence &&
+            data.recurrence !== "None" &&
+            data.endRecurrenceDate
+          ) {
+            const endRecurrence = DateTime.fromJSDate(
+              data.endRecurrenceDate.toDate(),
+            ).setZone("America/Santiago");
+            if (endRecurrence < todayStart) {
+              return;
+            }
+
+            let currentDate = startDate;
+            const eventDuration = endDate.diff(startDate).as("milliseconds");
+
+            while (currentDate <= endRecurrence) {
+              if (currentDate >= todayStart) {
+                const instanceStart = currentDate;
+                const instanceEnd = currentDate.plus({
+                  milliseconds: eventDuration,
+                });
+                docs.push({
+                  ...baseEvent,
+                  id: `${doc.id}_${currentDate.toISODate()}`,
+                  start: instanceStart.toJSDate(),
+                  end: instanceEnd.toJSDate(),
+                });
+              }
+
+              switch (data.recurrence.toLowerCase()) {
+                case "daily":
+                  currentDate = currentDate.plus({ days: 1 });
+                  break;
+                case "weekly":
+                  currentDate = currentDate.plus({ weeks: 1 });
+                  break;
+                case "monthly":
+                  currentDate = currentDate.plus({ months: 1 });
+                  break;
+                default:
+                  // console.warn(
+                  //   `Recurrence type ${data.recurrence} not supported for event ${doc.id}`,
+                  // );
+                  return;
+              }
+            }
+          }
         });
 
-        console.log("Items aprobados:", approvedItems);
-        setMenu(approvedItems);
+        setMenu(docs);
       } catch (error) {
         console.error("Error al obtener datos:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -94,7 +180,7 @@ const Cartadisp = () => {
           </p>
         </Modal.Body>
       </Modal>
-      <Tarjeta menu={menu} setMenu={setMenu} />
+      <Tarjeta menu={menu} setMenu={setMenu} loading={loading} />
     </div>
   );
 };
