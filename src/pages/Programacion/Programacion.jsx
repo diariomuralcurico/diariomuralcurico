@@ -460,8 +460,8 @@ const Programacion = () => {
   const groupedEvents = groupEventsByDay();
 
   return (
-    <Container className="py-6 max-w-4xl mx-auto">
-      <h2 className="agenda-title text-3xl font-semibold mb-10 font-codec text-gray-800 text-center">
+    <Container className="py-6 max-w-4xl mx-auto bg-[#c1f3e9]">
+      <h2 className="agenda-title text-3xl font-semibold mb-6 font-codec text-gray-800 text-center bg-white p-4 rounded-lg shadow-sm">
         Agenda de Actividades
       </h2>
       {loading && (
@@ -485,7 +485,7 @@ const Programacion = () => {
       ) : (
         groupedEvents.map(([date, events]) => (
           <div key={date} className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-700 font-codec mb-4 border-b-2 border-indigo-100 pb-2">
+            <h2 className="text-2xl font-semibold text-gray-700 font-codec mb-4 border-b-2 pb-2" style={{ borderColor: '#31a0e7' }}>
               {DateTime.fromISO(date, {
                 zone: "America/Santiago",
                 locale: "es-CL",
@@ -506,10 +506,10 @@ const Programacion = () => {
                   className="event-item flex justify-between items-center p-4 mb-2 bg-white rounded-lg shadow-sm hover:shadow-md hover:bg-indigo-50 transition-all duration-200 cursor-pointer"
                   onClick={() => handleEventClick(event)}
                 >
-                  <span className="event-title font-medium text-gray-800 font-codec truncate flex-1">
+                  <span className="event-title font-medium text-gray-800 font-codec whitespace-normal flex-1">
                     {event.title}
                   </span>
-                  <span className="event-time text-gray-600 font-codec text-sm">
+                  <span className="event-time text-gray-600 font-codec text-sm font-bold">
                     {DateTime.fromJSDate(event.start, {
                       zone: "America/Santiago",
                       locale: "es-CL",

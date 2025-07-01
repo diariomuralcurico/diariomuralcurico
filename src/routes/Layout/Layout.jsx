@@ -1,11 +1,14 @@
 import Footer from "../../components/Footer/Footer";
 import Navigation from "../Navigation/Navigation";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import './Layout.css';
 
 const Layout = () => {
+  const location = useLocation();
+  const isProgramacionPage = location.pathname === '/programacion';
+
   return (
-    <div>
+    <div className={isProgramacionPage ? 'bg-[#c1f3e9]' : ''}>
       <Navigation />
       <Outlet />
       <div className="page-container">

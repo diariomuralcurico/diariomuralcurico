@@ -80,17 +80,14 @@ const Inicio = () => {
           </Col>
           <Col md={12} lg={6}>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-codec text-center lg:text-left mb-6">
-              Quiénes Somos
+              QUIÉNES SOMOS
             </h2>
             <p className="text-lg text-gray-700 font-codec mb-4 leading-relaxed">
               Somos vecinos de Curicó, impulsando un proyecto de participación
               ciudadana.
             </p>
             <p className="text-lg text-gray-700 font-codec mb-4 leading-relaxed">
-              Nos preocupa la falta de participación en la oferta cultural local
-              y la construcción de identidad comunitaria. Amamos nuestra ciudad
-              y trabajamos para fomentar una solución que despierte la vitalidad
-              cultural de Curicó.
+              Nos preocupa la falta de participación en la oferta de actividades en general, la construcción de identidad y el desarrollo cultural de Curicó. Amamos nuestra ciudad y trabajamos para concretar una solución que despierte la vitalidad de Curicó.
             </p>
             <p className="text-lg font-bold text-indigo-600 font-codec text-center lg:text-left">
               ¡Por un Curicó más vivo!
@@ -102,23 +99,16 @@ const Inicio = () => {
         <Row className="items-center mb-16">
           <Col md={12} lg={6} className="order-2 lg:order-1">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-codec text-center lg:text-left mb-6">
-              Descripción General
+              DESCRIPCIÓN GENERAL
             </h2>
             <p className="text-lg text-gray-700 font-codec mb-4 leading-relaxed">
-              En un mar de banderas, cada persona busca destacar la suya, pero
-              se pierde en la multitud. Esta metáfora refleja la dispersión de
-              la agenda cultural en nuestra provincia, fragmentada por
-              publicaciones independientes en redes sociales.
+              En una multitud de personas con banderas en mano, cada persona busca destacar la suya levantándola, pero se pierde en la multitud. Esta metáfora refleja la dispersión de la agenda de actividades en nuestra provincia, fragmentada por publicaciones independientes en redes sociales.
             </p>
             <p className="text-lg text-gray-700 font-codec mb-4 leading-relaxed">
-              Observamos que muchos no están al tanto de las actividades
-              locales. Diario Mural Curicó propone una solución: una cartelera
-              unificada que visibiliza eventos a nivel provincial.
+              Observamos que muchos vecinos/as no están al tanto de las actividades locales. Diario Mural Curicó propone una solución: una cartelera unificada que visibiliza eventos a nivel provincial. Un sitio web diseñado para este fin y este lugar.
             </p>
             <p className="text-lg text-gray-700 font-codec leading-relaxed">
-              Nuestro objetivo es apoyar a gestores culturales y conectar a la
-              comunidad con eventos, promoviendo la identidad cultural y una
-              provincia más activa.
+              Nuestro objetivo es apoyar a gestores de actividades y conectar a la comunidad con eventos, promoviendo el encuentro, la identidad cultural y una provincia más activa.
             </p>
           </Col>
           <Col md={12} lg={6} className="order-1 lg:order-2 mb-6 lg:mb-0">
