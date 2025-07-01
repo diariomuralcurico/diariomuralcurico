@@ -340,6 +340,12 @@ function EventDialog({
               <p className="text-red-500 text-xs mt-1">{errors.color}</p>
             )}
           </div>
+          <div>
+            <label className="block text-sm font-medium text-red-500 font-codec">
+              Completa fecha y horario para tu evento único o del 1er evento en
+              caso de que se repita en el tiempo.
+            </label>
+          </div>
           <div className="flex space-x-4">
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 font-codec">
@@ -412,6 +418,65 @@ function EventDialog({
               </div>
             </div>
           )}
+          <div>
+            <label className="block text-sm font-medium text-red-500 font-codec">
+              En caso de que tu evento se repita en el tiempo, completa las
+              repeticiones.
+            </label>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 font-codec">
+              Repetición
+            </label>
+            <select
+              disabled={aprobado}
+              readOnly={aprobado}
+              name="recurrence"
+              value={newEvent.recurrence || "None"}
+              onChange={handleInputChange}
+              className="mt-1 block w-full border border-gray-300 rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500 font-codec"
+            >
+              {recurrenceOptions.map((rec) => (
+                <option key={rec.value} value={rec.value}>
+                  {rec.key}
+                </option>
+              ))}
+            </select>
+            {errors.recurrence && (
+              <p className="text-red-500 text-xs mt-1">{errors.recurrence}</p>
+            )}
+          </div>
+          {newEvent.recurrence !== "None" && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 font-codec">
+                Fecha de fin de repetición
+              </label>
+              <input
+                disabled={aprobado}
+                readOnly={aprobado}
+                type="date"
+                name="endRecurrenceDate"
+                value={formatDateForInput(newEvent.endRecurrenceDate)}
+                onChange={handleInputChange}
+                min={formatDateForInput(newEvent.date) || today}
+                className="mt-1 block w-full border border-gray-300 rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500 font-codec"
+              />
+              {errors.endRecurrenceDate && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.endRecurrenceDate}
+                </p>
+              )}
+            </div>
+          )}
+          <div>
+            <label className="block text-sm font-medium text-red-500 font-codec">
+              Una vez guardes este formulario revisa tu actividad en el
+              calendario.
+            </label>
+            <label className="block text-sm font-medium text-red-500 font-codec">
+              Modifica pinchando tu evento en caso lo necesites.
+            </label>
+          </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 font-codec">
               Descripción * (máx. 700 caracteres)
@@ -672,50 +737,6 @@ function EventDialog({
               <p className="text-red-500 text-xs mt-1">{errors.edad}</p>
             )}
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 font-codec">
-              Repetición
-            </label>
-            <select
-              disabled={aprobado}
-              readOnly={aprobado}
-              name="recurrence"
-              value={newEvent.recurrence || "None"}
-              onChange={handleInputChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500 font-codec"
-            >
-              {recurrenceOptions.map((rec) => (
-                <option key={rec.value} value={rec.value}>
-                  {rec.key}
-                </option>
-              ))}
-            </select>
-            {errors.recurrence && (
-              <p className="text-red-500 text-xs mt-1">{errors.recurrence}</p>
-            )}
-          </div>
-          {newEvent.recurrence !== "None" && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 font-codec">
-                Fecha de fin de repetición
-              </label>
-              <input
-                disabled={aprobado}
-                readOnly={aprobado}
-                type="date"
-                name="endRecurrenceDate"
-                value={formatDateForInput(newEvent.endRecurrenceDate)}
-                onChange={handleInputChange}
-                min={formatDateForInput(newEvent.date) || today}
-                className="mt-1 block w-full border border-gray-300 rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500 font-codec"
-              />
-              {errors.endRecurrenceDate && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.endRecurrenceDate}
-                </p>
-              )}
-            </div>
-          )}
         </div>
         <div className="mt-8 flex justify-end space-x-4">
           <button
