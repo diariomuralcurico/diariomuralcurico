@@ -105,7 +105,10 @@ const Inicio = () => {
               En una multitud de personas con banderas en mano, cada persona busca destacar la suya levantándola, pero se pierde en la multitud. Esta metáfora refleja la dispersión de la agenda de actividades en nuestra provincia, fragmentada por publicaciones independientes en redes sociales.
             </p>
             <p className="text-lg text-gray-700 font-codec mb-4 leading-relaxed">
-              Observamos que muchos vecinos/as no están al tanto de las actividades locales. Diario Mural Curicó propone una solución: una cartelera unificada que visibiliza eventos a nivel provincial. Un sitio web diseñado para este fin y este lugar.
+              Por otro lado, observamos que muchos vecinos/as no están al tanto de las actividades locales.
+            </p>
+            <p className="text-lg text-gray-700 font-codec mb-4 leading-relaxed">
+              Diario Mural Curicó propone una solución: una cartelera unificada que visibiliza eventos a nivel provincial. Un sitio web diseñado para este fin y este lugar.
             </p>
             <p className="text-lg text-gray-700 font-codec leading-relaxed">
               Nuestro objetivo es apoyar a gestores de actividades y conectar a la comunidad con eventos, promoviendo el encuentro, la identidad cultural y una provincia más activa.
