@@ -503,13 +503,13 @@ const Programacion = () => {
               {events.map((event) => (
                 <li
                   key={event.id}
-                  className="event-item flex justify-between items-center p-4 mb-2 bg-white rounded-lg shadow-sm hover:shadow-md hover:bg-indigo-50 transition-all duration-200 cursor-pointer"
+                  className="event-item flex justify-between items-center gap-4 p-4 mb-2 bg-white rounded-lg shadow-sm hover:shadow-md hover:bg-indigo-50 transition-all duration-200 cursor-pointer"
                   onClick={() => handleEventClick(event)}
                 >
-                  <span className="event-title font-medium text-gray-800 font-codec whitespace-normal flex-1">
+                  <span className="event-title font-medium text-gray-800 font-codec whitespace-normal flex-1 text-lg">
                     {event.title}
                   </span>
-                  <span className="event-time text-gray-600 font-codec text-sm font-bold">
+                  <span className="event-time text-gray-600 font-codec text-base font-bold flex-shrink-0">
                     {DateTime.fromJSDate(event.start, {
                       zone: "America/Santiago",
                       locale: "es-CL",

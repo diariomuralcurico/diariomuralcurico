@@ -155,14 +155,17 @@ function EventDialog({
     // Validación de categoría
     const validCategories = [
       "Artes y diseño",
-      "Música y teatro",
+      "Música y artes escénicas",
       "Cultura y tradiciones",
       "Gastronomía",
       "Deportes y aire libre",
       "Ferias y exposiciones",
       "Fiestas y celebraciones",
       "Ocio y pasatiempos",
-      "Talleres, concursos",
+      "Talleres",
+      "Concursos",
+      "Infantil",
+      "Turismo",
       "Otros",
     ];
     if (!newEvent.categoria || !validCategories.includes(newEvent.categoria)) {
@@ -235,9 +238,10 @@ function EventDialog({
     }
 
     // Validación de edad
-    const validAges = ["Todas las edades", "+4", "+6", "+8", "+10", "+18"];
-    if (!newEvent.edad || !validAges.includes(newEvent.edad)) {
-      newErrors.edad = "Seleccione una edad mínima válida.";
+    if (!newEvent.edad || typeof newEvent.edad !== "string" || newEvent.edad.trim() === "") {
+      newErrors.edad = "La edad es obligatoria.";
+    } else if (newEvent.edad.length > 50) {
+      newErrors.edad = "La edad no puede exceder los 50 caracteres.";
     }
 
     // Validación de color
@@ -341,7 +345,7 @@ function EventDialog({
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-red-500 font-codec">
+            <label className="block text-sm font-medium text-indigo-600 font-codec">
               Completa fecha y horario para tu evento único o del 1er evento en
               caso de que se repita en el tiempo.
             </label>
@@ -419,7 +423,7 @@ function EventDialog({
             </div>
           )}
           <div>
-            <label className="block text-sm font-medium text-red-500 font-codec">
+            <label className="block text-sm font-medium text-indigo-600 font-codec">
               En caso de que tu evento se repita en el tiempo, completa las
               repeticiones.
             </label>
@@ -469,12 +473,15 @@ function EventDialog({
             </div>
           )}
           <div>
-            <label className="block text-sm font-medium text-red-500 font-codec">
+            <label className="block text-sm font-medium text-indigo-600 font-codec">
               Una vez guardes este formulario revisa tu actividad en el
               calendario.
             </label>
-            <label className="block text-sm font-medium text-red-500 font-codec">
-              Modifica pinchando tu evento en caso lo necesites.
+            <label className="block text-sm font-medium text-indigo-600 font-codec">
+              Modifica pinchando tu evento en caso que lo necesites.
+            </label>
+            <label className="block text-sm font-medium text-indigo-600 font-codec">
+              Una vez aprobado el evento, deja de ser editable.
             </label>
           </div>
           <div>
@@ -601,14 +608,17 @@ function EventDialog({
             >
               {[
                 "Artes y diseño",
-                "Música y teatro",
+                "Música y artes escénicas",
                 "Cultura y tradiciones",
                 "Gastronomía",
                 "Deportes y aire libre",
                 "Ferias y exposiciones",
                 "Fiestas y celebraciones",
                 "Ocio y pasatiempos",
-                "Talleres, concursos",
+                "Talleres",
+                "Concursos",
+                "Infantil",
+                "Turismo",
                 "Otros",
               ].map((cat) => (
                 <option key={cat} value={cat}>
@@ -631,27 +641,11 @@ function EventDialog({
               value={newEvent.precio}
               onChange={handleInputChange}
               className="mt-1 block w-full border border-gray-300 rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500 font-codec"
-              placeholder="Ingrese -1 para 'Consultar'"
+              placeholder="Ingrese -1 para
+              'Consultar valor a organizador' y 0 para 'Gratis'"
             />
             {errors.precio && (
               <p className="text-red-500 text-xs mt-1">{errors.precio}</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 font-codec">
-              Responsable * (máx. 100 caracteres)
-            </label>
-            <input
-              readOnly={aprobado}
-              type="text"
-              name="persona"
-              value={newEvent.persona || ""}
-              onChange={handleInputChange}
-              maxLength={100}
-              className="mt-1 block w-full border border-gray-300 rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500 font-codec"
-            />
-            {errors.persona && (
-              <p className="text-red-500 text-xs mt-1">{errors.persona}</p>
             )}
           </div>
           <div>
@@ -717,22 +711,16 @@ function EventDialog({
             <label className="block text-sm font-medium text-gray-700 font-codec">
               Edad mínima *
             </label>
-            <select
-              disabled={aprobado}
+            <input
               readOnly={aprobado}
+              type="text"
               name="edad"
-              value={newEvent.edad || "Todas las edades"}
+              value={newEvent.edad || ""}
               onChange={handleInputChange}
+              maxLength={50}
               className="mt-1 block w-full border border-gray-300 rounded-md p-3 focus:ring-indigo-500 focus:border-indigo-500 font-codec"
-            >
-              {["Todas las edades", "+4", "+6", "+8", "+10", "+18"].map(
-                (age) => (
-                  <option key={age} value={age}>
-                    {age}
-                  </option>
-                ),
-              )}
-            </select>
+              placeholder="Ej: Todas las edades, +18, etc."
+            />
             {errors.edad && (
               <p className="text-red-500 text-xs mt-1">{errors.edad}</p>
             )}
@@ -750,7 +738,7 @@ function EventDialog({
             onClick={handleSubmit}
             className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200 font-codec disabled:bg-gray-400"
           >
-            {isEditing ? "Actualizar" : "Guardar"}
+            {isEditing ? "Guardar" : "Guardar"}
           </button>
         </div>
       </div>
