@@ -474,7 +474,10 @@ function EventDialog({
               calendario.
             </label>
             <label className="block text-sm font-medium text-red-500 font-codec">
-              Modifica pinchando tu evento en caso lo necesites.
+              Modifica pinchando tu evento en caso que lo necesites.
+            </label>
+            <label className="block text-sm font-medium text-red-500 font-codec">
+              Una vez aprobado el evento, deja de ser editable.
             </label>
           </div>
           <div>
