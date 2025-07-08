@@ -24,6 +24,7 @@ const Allroutes = () => {
           }
         />
         <Route path="/" element={<Cartadisp />} />
+        <Route path="/:permalink" element={<Cartadisp />} />
         <Route path="/revlamafe" element={<Revisar />} />
         <Route path="/programacion" element={<Programacion />} />
         <Route path="/programacion/:permalink" element={<Programacion />} />

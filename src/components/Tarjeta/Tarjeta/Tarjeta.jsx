@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Card,
   Col,
@@ -13,19 +14,47 @@ import "dayjs/locale/es";
 import "./Tarjeta.css";
 import { BarLoader } from "react-spinners";
 import CardHeader from "react-bootstrap/esm/CardHeader";
+import { DateTime } from "luxon";
+
+const generatePermalink = (event) => {
+  if (!event || !event.title || !event.start) {
+    return "";
+  }
+  const titleSlug = event.title
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  const eventDate = DateTime.fromJSDate(event.start, {
+    zone: "America/Santiago",
+  });
+  const dateString = eventDate.toFormat("ddMMyyyyHHmm");
+  return `${titleSlug}${dateString}`;
+};
 
 const Tarjeta = ({ menu, loading }) => {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
   const [ordenFecha, setOrdenFecha] = useState("asc");
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const { permalink } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.body.style.overflow = showModal ? "hidden" : "auto";
+    if (permalink && menu.length > 0 && !selectedEvent) {
+      const eventToOpen = menu.find((e) => generatePermalink(e) === permalink);
+      if (eventToOpen) {
+        setSelectedEvent(eventToOpen);
+        setShowModal(true);
+      }
+    }
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [showModal]);
+  }, [showModal, permalink, menu, selectedEvent]);
 
   // Ya no agrupamos por nombre y fechas, simplemente usamos los eventos tal como están
   const menuOrdenado = useMemo(() => {
@@ -54,11 +83,15 @@ const Tarjeta = ({ menu, loading }) => {
   const handleSelectEvent = useCallback((plato) => {
     setSelectedEvent(plato);
     setShowModal(true);
-  }, []);
+    const eventPermalink = generatePermalink(plato);
+    navigate(`/${eventPermalink}`);
+  }, [navigate]);
 
   const handleCloseModal = useCallback(() => {
     setShowModal(false);
-  }, []);
+    setSelectedEvent(null);
+    navigate('/');
+  }, [navigate]);
 
   const handleFiltrarPorCategoria = useCallback((e) => {
     setCategoriaSeleccionada(e.target.value);
@@ -222,6 +255,16 @@ const Tarjeta = ({ menu, loading }) => {
           )}
         </Modal.Body>
         <Modal.Footer>
+          <Button
+            variant="light"
+            onClick={() => {
+              const permalinkUrl = `${window.location.origin}/${generatePermalink(selectedEvent)}`;
+              navigator.clipboard.writeText(permalinkUrl);
+            }}
+            className="font-codec bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md px-4 py-2 transition-colors duration-200"
+          >
+            Copiar Enlace
+          </Button>
           <Button variant="secondary" onClick={handleCloseModal}>
             Cerrar
           </Button>
