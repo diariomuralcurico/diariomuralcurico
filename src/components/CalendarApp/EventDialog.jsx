@@ -203,17 +203,18 @@ function EventDialog({
       newErrors.afiche = "Al menos un afiche es obligatorio en modo edición.";
     }
 
+    // Sacamos el responsable
     // Validación de responsable
-    if (
-      !newEvent.persona ||
-      typeof newEvent.persona !== "string" ||
-      newEvent.persona.trim() === ""
-    ) {
-      newErrors.persona = "El nombre del responsable es obligatorio.";
-    } else if (newEvent.persona.length > 100) {
-      newErrors.persona =
-        "El nombre del responsable no puede exceder los 100 caracteres.";
-    }
+    // if (
+    //   !newEvent.persona ||
+    //   typeof newEvent.persona !== "string" ||
+    //   newEvent.persona.trim() === ""
+    // ) {
+    //   newErrors.persona = "El nombre del responsable es obligatorio.";
+    // } else if (newEvent.persona.length > 100) {
+    //   newErrors.persona =
+    //     "El nombre del responsable no puede exceder los 100 caracteres.";
+    // }
 
     // Validación de teléfono
     const chileanPhoneRegex = /^\+56[9]\d{8}$/;
@@ -238,7 +239,11 @@ function EventDialog({
     }
 
     // Validación de edad
-    if (!newEvent.edad || typeof newEvent.edad !== "string" || newEvent.edad.trim() === "") {
+    if (
+      !newEvent.edad ||
+      typeof newEvent.edad !== "string" ||
+      newEvent.edad.trim() === ""
+    ) {
       newErrors.edad = "La edad es obligatoria.";
     } else if (newEvent.edad.length > 50) {
       newErrors.edad = "La edad no puede exceder los 50 caracteres.";

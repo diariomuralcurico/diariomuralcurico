@@ -1,6 +1,21 @@
 import React from "react";
 import { DateTime } from "luxon";
 import useEscapeKey from "./useEscapeKey";
+import { useFitText } from "./useFitText"; // Importar el nuevo hook
+
+// Componente interno para usar el hook, ya que no se puede usar en un bucle directamente
+const FitText = ({ text }) => {
+  const { fontSize, ref } = useFitText(text, 14); // Inicia con 14px
+  return (
+    <span
+      ref={ref}
+      style={{ fontSize, display: "block", height: "100%", lineHeight: 1.2 }}
+      className="font-medium block"
+    >
+      {text}
+    </span>
+  );
+};
 
 function HourlyViewModal({
   show,
@@ -139,7 +154,7 @@ function HourlyViewModal({
       telefono: "",
       correo: "",
       link: "",
-      edad: "Todas las edades",
+      edad: "",
       color: "#f9a8d4",
       recurrence: "None",
       endRecurrenceDate: "",
@@ -394,9 +409,11 @@ function HourlyViewModal({
                     { zone: "America/Santiago" },
                   ).toFormat("dd/MM/yyyy HH:mm")})`}
                 >
-                  <span className="font-medium block leading-tight">
-                    {event.title}
-                  </span>
+                  <div style={{ height: "calc(100% - 20px)" }}>
+                    {" "}
+                    {/* Contenedor para el título */}
+                    <FitText text={event.title} />
+                  </div>
                   <span className="text-[9px] sm:text-xs block opacity-90 mt-1">
                     {event.time} - {event.endTime}
                   </span>

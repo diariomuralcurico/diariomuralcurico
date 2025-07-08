@@ -255,7 +255,7 @@ function CalendarView({
                     telefono: event.telefono || "",
                     correo: event.correo || "",
                     link: event.link || "",
-                    edad: event.edad || "Todas las edades",
+                    edad: event.edad || "",
                     color: event.color || "#f9a8d4",
                     recurrence: event.recurrence || "None",
                     endRecurrenceDate: event.endRecurrenceDate
