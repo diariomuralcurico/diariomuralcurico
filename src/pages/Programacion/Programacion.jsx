@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { db } from "../../config/Firebase";
 import { collection, getDocs, query, where, or } from "firebase/firestore";
 import { useAuth } from "../../components/AuthContext";
@@ -8,6 +9,24 @@ import { BarLoader } from "react-spinners";
 import "./Programacion.css";
 
 const globalImageCache = {};
+
+const generatePermalink = (event) => {
+  if (!event || !event.title || !event.start) {
+    return "";
+  }
+  const titleSlug = event.title
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  const eventDate = DateTime.fromJSDate(event.start, {
+    zone: "America/Santiago",
+  });
+  const dateString = eventDate.toFormat("ddMMyyyyHHmm");
+  return `${titleSlug}${dateString}`;
+};
 
 const EventCarousel = ({
   images: rawImages,
@@ -240,6 +259,8 @@ const Programacion = () => {
   const [selectedEvent, setSelectedEvent] = React.useState(null);
   const [showModal, setShowModal] = React.useState(false);
   const [loading, setLoading] = useState(true);
+  const { permalink } = useParams();
+  const navigate = useNavigate();
 
   const fetchEvents = useCallback(async () => {
     setLoading(true);
@@ -369,12 +390,19 @@ const Programacion = () => {
       });
 
       setEventos(docs);
+      if (permalink) {
+        const eventToOpen = docs.find((e) => generatePermalink(e) === permalink);
+        if (eventToOpen) {
+          setSelectedEvent(eventToOpen);
+          setShowModal(true);
+        }
+      }
     } catch (error) {
       console.error("Error al obtener eventos:", error);
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, permalink]);
 
   useEffect(() => {
     fetchEvents();
@@ -430,12 +458,15 @@ const Programacion = () => {
   const handleEventClick = useCallback((event) => {
     setSelectedEvent(event);
     setShowModal(true);
-  }, []);
+    const eventPermalink = generatePermalink(event);
+    navigate(`/programacion/${eventPermalink}`);
+  }, [navigate]);
 
   const handleCloseModal = useCallback(() => {
     setShowModal(false);
     setSelectedEvent(null);
-  }, []);
+    navigate('/programacion');
+  }, [navigate]);
 
   const formatPrice = (precio) => {
     if (precio === undefined || precio === null) return null;
@@ -763,6 +794,16 @@ const Programacion = () => {
             </div>
           </Modal.Body>
           <Modal.Footer className="border-t-0 bg-indigo-50">
+            <Button
+              variant="light"
+              onClick={() => {
+                const permalinkUrl = `${window.location.origin}/programacion/${generatePermalink(selectedEvent)}`;
+                navigator.clipboard.writeText(permalinkUrl);
+              }}
+              className="font-codec bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md px-4 py-2 transition-colors duration-200"
+            >
+              Copiar Enlace
+            </Button>
             <Button
               variant="secondary"
               onClick={handleCloseModal}

@@ -26,6 +26,7 @@ const Allroutes = () => {
         <Route path="/" element={<Cartadisp />} />
         <Route path="/revlamafe" element={<Revisar />} />
         <Route path="/programacion" element={<Programacion />} />
+        <Route path="/programacion/:permalink" element={<Programacion />} />
         <Route path="/deleCard" element={<EliminarCarta />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
