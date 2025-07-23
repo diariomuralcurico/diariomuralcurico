@@ -12,17 +12,22 @@ function EventDialog({
   selectedDate,
   showTimeField,
   isEditing,
+  initialSelectedWeekdays = [],
 }) {
   useEscapeKey(show, onClose);
   const [errors, setErrors] = useState({});
   const [phoneValid, setPhoneValid] = useState(null); // Estado para validación en tiempo real del teléfono
+  const [selectedWeekdays, setSelectedWeekdays] = useState(initialSelectedWeekdays);
 
   useEffect(() => {
-    if (!show) {
+    if (show) {
+      setSelectedWeekdays(initialSelectedWeekdays || []);
+    } else {
       setErrors({});
       setPhoneValid(null);
+      setSelectedWeekdays([]);
     }
-  }, [show]);
+  }, [show, initialSelectedWeekdays]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -57,6 +62,12 @@ function EventDialog({
     // Validación en tiempo real
     const chileanPhoneRegex = /^\+56[9]\d{8}$/;
     setPhoneValid(chileanPhoneRegex.test(value));
+  };
+
+  const handleWeekdayToggle = (day) => {
+    setSelectedWeekdays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
+    );
   };
 
   const handleFileChange = (e) => {
@@ -289,7 +300,7 @@ function EventDialog({
 
   const handleSubmit = () => {
     if (validateForm()) {
-      onAdd(setErrors);
+      onAdd(setErrors, selectedWeekdays);
     }
   };
 
@@ -455,6 +466,37 @@ function EventDialog({
               <p className="text-red-500 text-xs mt-1">{errors.recurrence}</p>
             )}
           </div>
+          {newEvent.recurrence === "Weekly" && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 font-codec">
+                Repetir los días
+              </label>
+              <div className="flex space-x-2 mt-2">
+                {[
+                  { key: "L", value: 1 },
+                  { key: "M", value: 2 },
+                  { key: "M", value: 3 },
+                  { key: "J", value: 4 },
+                  { key: "V", value: 5 },
+                  { key: "S", value: 6 },
+                  { key: "D", value: 7 },
+                ].map((day) => (
+                  <button
+                    key={day.value}
+                    type="button"
+                    onClick={() => handleWeekdayToggle(day.value)}
+                    className={`w-10 h-10 rounded-full font-codec ${
+                      selectedWeekdays.includes(day.value)
+                        ? "bg-indigo-600 text-white"
+                        : "bg-gray-200 text-gray-700"
+                    }`}
+                  >
+                    {day.key}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           {newEvent.recurrence !== "None" && (
             <div>
               <label className="block text-sm font-medium text-gray-700 font-codec">

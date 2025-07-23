@@ -314,6 +314,7 @@ function CalendarApp({
             afiche: Array.isArray(data.afiche)
               ? data.afiche
               : [data.afiche].filter(Boolean),
+            selectedWeekdays: data.selectedWeekdays || [],
           };
         });
         setEvents(fetchedEvents);
@@ -326,7 +327,7 @@ function CalendarApp({
     fetchEvents();
   }, [user, onEventChange]);
 
-  const handleAddOrUpdateEvent = async (setErrors = () => {}) => {
+  const handleAddOrUpdateEvent = async (setErrors = () => {}, selectedWeekdays = []) => {
     setLoading(true);
     const newErrors = {};
     if (Object.keys(newErrors).length > 0) {
@@ -439,34 +440,49 @@ function CalendarApp({
 
     let recurrenceDates = [];
     if (newEvent.recurrence !== "None") {
-      let currentDate =
-        DateTime.fromJSDate(startDate).setZone("America/Santiago");
-      const endRecur =
-        DateTime.fromJSDate(endRecurDate).setZone("America/Santiago");
-      while (currentDate <= endRecur) {
-        const dateStr = currentDate.toISODate();
-        const startTime = newEvent.time
-          ? `${dateStr}T${newEvent.time}:00`
-          : `${dateStr}T00:00:00`;
-        const endTime = newEvent.endTime
-          ? `${dateStr}T${newEvent.endTime}:00`
-          : `${dateStr}T23:59:59`;
-        recurrenceDates.push({
-          start: DateTime.fromISO(startTime, {
-            zone: "America/Santiago",
-          }).toJSDate(),
-          end: DateTime.fromISO(endTime, {
-            zone: "America/Santiago",
-          }).toJSDate(),
-        });
-        if (newEvent.recurrence === "Daily") {
-          currentDate = currentDate.plus({ days: 1 });
-        } else if (newEvent.recurrence === "Weekly") {
-          currentDate = currentDate.plus({ weeks: 1 });
-        } else if (newEvent.recurrence === "Monthly") {
-          currentDate = currentDate.plus({ months: 1 });
-        } else {
-          break;
+      const startDateLuxon = DateTime.fromJSDate(startDate).setZone(
+        "America/Santiago",
+      );
+      const endRecurLuxon = DateTime.fromJSDate(endRecurDate).setZone(
+        "America/Santiago",
+      );
+
+      if (newEvent.recurrence === "Weekly" && selectedWeekdays.length > 0) {
+        let tempDate = startDateLuxon;
+        while (tempDate <= endRecurLuxon) {
+          if (selectedWeekdays.includes(tempDate.weekday)) {
+            recurrenceDates.push({
+              start: tempDate.toJSDate(),
+              end: tempDate.toJSDate(), // Assuming event lasts one day
+            });
+          }
+          tempDate = tempDate.plus({ days: 1 });
+        }
+      } else {
+        let currentDate = startDateLuxon;
+        while (currentDate <= endRecurLuxon) {
+          const dateStr = currentDate.toISODate();
+          const startTime = newEvent.time || "00:00";
+          const endTime = newEvent.endTime || "23:59";
+
+          recurrenceDates.push({
+            start: DateTime.fromISO(`${dateStr}T${startTime}`, {
+              zone: "America/Santiago",
+            }).toJSDate(),
+            end: DateTime.fromISO(`${dateStr}T${endTime}`, {
+              zone: "America/Santiago",
+            }).toJSDate(),
+          });
+
+          if (newEvent.recurrence === "Daily") {
+            currentDate = currentDate.plus({ days: 1 });
+          } else if (newEvent.recurrence === "Weekly") {
+            currentDate = currentDate.plus({ weeks: 1 });
+          } else if (newEvent.recurrence === "Monthly") {
+            currentDate = currentDate.plus({ months: 1 });
+          } else {
+            break;
+          }
         }
       }
     }
@@ -502,6 +518,7 @@ function CalendarApp({
         fechaHoraFinActividad: Timestamp.fromDate(endDate),
         aprobado: newEvent.aprobado || 0,
         createdBy: newEvent.createdBy || user.uid,
+        selectedWeekdays: selectedWeekdays,
       };
 
       if (editingEvent) {
@@ -618,8 +635,9 @@ function CalendarApp({
           }).toISODate()
         : "",
       recurrenceDates: event.recurrenceDates || [],
+      selectedWeekdays: event.selectedWeekdays || [],
     });
-    setEditingEvent({ ...event });
+    setEditingEvent({ ...event, selectedWeekdays: event.selectedWeekdays || [] });
     setShowDialog(true);
   };
 
@@ -689,12 +707,13 @@ function CalendarApp({
             setEditingEvent(null);
           }, dialogCloseAnimationDuration);
         }}
-        onAdd={handleAddOrUpdateEvent}
+        onAdd={(setErrors, selectedWeekdays) => handleAddOrUpdateEvent(setErrors, selectedWeekdays)}
         newEvent={newEvent}
         setNewEvent={setNewEvent}
         selectedDate={selectedDay ? new Date(selectedDay) : null}
         showTimeField={true}
         isEditing={!!editingEvent}
+        initialSelectedWeekdays={editingEvent ? editingEvent.selectedWeekdays : []}
       />
       {showTour && (
         <TourModal
