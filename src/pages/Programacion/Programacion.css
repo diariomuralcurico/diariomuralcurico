@@ -152,6 +152,14 @@
     }
 }
 
+.event-modal-backdrop {
+    background-color: #c1f3e9 !important;
+}
+
+.event-modal .modal-backdrop {
+    background-color: #c1f3e9;
+}
+
 .font-codec {
     font-family: "Codec Pro", sans-serif;
 }

@@ -565,6 +565,7 @@ const Programacion = () => {
           centered
           size="lg"
           className="event-modal"
+          backdropClassName="event-modal-backdrop"
         >
           <Modal.Header closeButton className="border-b-0 bg-indigo-50">
             <Modal.Title className="text-2xl font-bold text-gray-800 font-codec">
