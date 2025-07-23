@@ -13,21 +13,25 @@ function EventDialog({
   showTimeField,
   isEditing,
   initialSelectedWeekdays = [],
+  initialSelectedMonthDays = [],
 }) {
   useEscapeKey(show, onClose);
   const [errors, setErrors] = useState({});
   const [phoneValid, setPhoneValid] = useState(null); // Estado para validación en tiempo real del teléfono
   const [selectedWeekdays, setSelectedWeekdays] = useState(initialSelectedWeekdays);
+  const [selectedMonthDays, setSelectedMonthDays] = useState(initialSelectedMonthDays);
 
   useEffect(() => {
     if (show) {
       setSelectedWeekdays(initialSelectedWeekdays || []);
+      setSelectedMonthDays(initialSelectedMonthDays || []);
     } else {
       setErrors({});
       setPhoneValid(null);
       setSelectedWeekdays([]);
+      setSelectedMonthDays([]);
     }
-  }, [show, initialSelectedWeekdays]);
+  }, [show, initialSelectedWeekdays, initialSelectedMonthDays]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -83,6 +87,12 @@ function EventDialog({
       ...prev,
       afiche: prev.afiche.filter((_, index) => index !== indexToDelete),
     }));
+  };
+
+  const handleMonthDayToggle = (day) => {
+    setSelectedMonthDays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
+    );
   };
 
   const validateForm = () => {
@@ -292,6 +302,14 @@ function EventDialog({
         newErrors.endRecurrenceDate =
           "La fecha de fin de recurrencia no puede ser anterior a la fecha de inicio.";
       }
+
+      if (newEvent.recurrence === "Weekly" && selectedWeekdays.length === 0) {
+        newErrors.recurrence = "Seleccione al menos un día de la semana para la recurrencia semanal.";
+      }
+
+      if (newEvent.recurrence === "Monthly" && selectedMonthDays.length === 0) {
+        newErrors.recurrence = "Seleccione al menos un día del mes para la recurrencia mensual.";
+      }
     }
 
     setErrors(newErrors);
@@ -300,7 +318,7 @@ function EventDialog({
 
   const handleSubmit = () => {
     if (validateForm()) {
-      onAdd(setErrors, selectedWeekdays);
+      onAdd(setErrors, selectedWeekdays, selectedMonthDays);
     }
   };
 
@@ -492,6 +510,29 @@ function EventDialog({
                     }`}
                   >
                     {day.key}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {newEvent.recurrence === "Monthly" && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 font-codec">
+                Repetir los días del mes
+              </label>
+              <div className="grid grid-cols-7 gap-2 mt-2">
+                {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                  <button
+                    key={day}
+                    type="button"
+                    onClick={() => handleMonthDayToggle(day)}
+                    className={`w-10 h-10 rounded-full font-codec ${
+                      selectedMonthDays.includes(day)
+                        ? "bg-indigo-600 text-white"
+                        : "bg-gray-200 text-gray-700"
+                    }`}
+                  >
+                    {day}
                   </button>
                 ))}
               </div>

@@ -1,0 +1,41 @@
+/* EventDialog.css */
+.event-dialog {
+    max-width: 95vw; /* Limitar ancho en móviles */
+}
+
+.event-dialog input,
+.event-dialog select,
+.event-dialog textarea {
+    font-size: 0.875rem; /* Tamaño base más pequeño */
+}
+
+.event-dialog .max-w-2xl {
+    max-width: 90vw; /* Ajustar ancho en móviles */
+}
+
+@media (max-width: 640px) {
+    .event-dialog .p-8 {
+        padding: 1rem;
+    }
+
+    .event-dialog .text-sm {
+        font-size: 0.75rem;
+    }
+
+    .event-dialog .p-3 {
+        padding: 0.5rem;
+    }
+
+    .event-dialog .mt-8 {
+        margin-top: 1.5rem;
+    }
+
+    .event-dialog .w-32 {
+        width: 5rem;
+        height: 5rem;
+    }
+
+    .event-dialog .text-xs {
+        font-size: 0.65rem;
+    }
+}

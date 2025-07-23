@@ -327,7 +327,7 @@ function CalendarApp({
     fetchEvents();
   }, [user, onEventChange]);
 
-  const handleAddOrUpdateEvent = async (setErrors = () => {}, selectedWeekdays = []) => {
+  const handleAddOrUpdateEvent = async (setErrors = () => {}, selectedWeekdays = [], selectedMonthDays = []) => {
     setLoading(true);
     const newErrors = {};
     if (Object.keys(newErrors).length > 0) {
@@ -458,6 +458,17 @@ function CalendarApp({
           }
           tempDate = tempDate.plus({ days: 1 });
         }
+      } else if (newEvent.recurrence === "Monthly" && selectedMonthDays.length > 0) {
+        let tempDate = startDateLuxon;
+        while (tempDate <= endRecurLuxon) {
+          if (selectedMonthDays.includes(tempDate.day)) {
+            recurrenceDates.push({
+              start: tempDate.toJSDate(),
+              end: tempDate.toJSDate(),
+            });
+          }
+          tempDate = tempDate.plus({ days: 1 });
+        }
       } else {
         let currentDate = startDateLuxon;
         while (currentDate <= endRecurLuxon) {
@@ -519,6 +530,7 @@ function CalendarApp({
         aprobado: newEvent.aprobado || 0,
         createdBy: newEvent.createdBy || user.uid,
         selectedWeekdays: selectedWeekdays,
+        selectedMonthDays: selectedMonthDays,
       };
 
       if (editingEvent) {
@@ -636,8 +648,9 @@ function CalendarApp({
         : "",
       recurrenceDates: event.recurrenceDates || [],
       selectedWeekdays: event.selectedWeekdays || [],
+      selectedMonthDays: event.selectedMonthDays || [],
     });
-    setEditingEvent({ ...event, selectedWeekdays: event.selectedWeekdays || [] });
+    setEditingEvent({ ...event, selectedWeekdays: event.selectedWeekdays || [], selectedMonthDays: event.selectedMonthDays || [] });
     setShowDialog(true);
   };
 
@@ -707,13 +720,14 @@ function CalendarApp({
             setEditingEvent(null);
           }, dialogCloseAnimationDuration);
         }}
-        onAdd={(setErrors, selectedWeekdays) => handleAddOrUpdateEvent(setErrors, selectedWeekdays)}
+        onAdd={(setErrors, selectedWeekdays, selectedMonthDays) => handleAddOrUpdateEvent(setErrors, selectedWeekdays, selectedMonthDays)}
         newEvent={newEvent}
         setNewEvent={setNewEvent}
         selectedDate={selectedDay ? new Date(selectedDay) : null}
         showTimeField={true}
         isEditing={!!editingEvent}
         initialSelectedWeekdays={editingEvent ? editingEvent.selectedWeekdays : []}
+        initialSelectedMonthDays={editingEvent ? editingEvent.selectedMonthDays : []}
       />
       {showTour && (
         <TourModal

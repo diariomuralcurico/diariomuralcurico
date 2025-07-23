@@ -1,0 +1,9 @@
+/* Estilos para CalendarApp */
+
+@media (min-width: 768px) { /* Por ejemplo, para pantallas de tablet y escritorio */
+  .calendar-view-container {
+    width: calc(100% + 72px) !important;
+    margin-left: -36px !important;
+    margin-right: -36px !important;
+  }
+}

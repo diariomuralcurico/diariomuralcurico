@@ -29,3 +29,6 @@ yarn-error.log*
 *.log
 .bwignore
 dev-data/
+firebase-export-*
+observacion.jpeg
+src/__test__
