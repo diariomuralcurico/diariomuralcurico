@@ -18,8 +18,12 @@ function EventDialog({
   useEscapeKey(show, onClose);
   const [errors, setErrors] = useState({});
   const [phoneValid, setPhoneValid] = useState(null); // Estado para validación en tiempo real del teléfono
-  const [selectedWeekdays, setSelectedWeekdays] = useState(initialSelectedWeekdays);
-  const [selectedMonthDays, setSelectedMonthDays] = useState(initialSelectedMonthDays);
+  const [selectedWeekdays, setSelectedWeekdays] = useState(
+    initialSelectedWeekdays,
+  );
+  const [selectedMonthDays, setSelectedMonthDays] = useState(
+    initialSelectedMonthDays,
+  );
 
   useEffect(() => {
     if (show) {
@@ -304,11 +308,13 @@ function EventDialog({
       }
 
       if (newEvent.recurrence === "Weekly" && selectedWeekdays.length === 0) {
-        newErrors.recurrence = "Seleccione al menos un día de la semana para la recurrencia semanal.";
+        newErrors.recurrence =
+          "Seleccione al menos un día de la semana para la recurrencia semanal.";
       }
 
       if (newEvent.recurrence === "Monthly" && selectedMonthDays.length === 0) {
-        newErrors.recurrence = "Seleccione al menos un día del mes para la recurrencia mensual.";
+        newErrors.recurrence =
+          "Seleccione al menos un día del mes para la recurrencia mensual.";
       }
     }
 
@@ -501,6 +507,7 @@ function EventDialog({
                 ].map((day) => (
                   <button
                     key={day.value}
+                    disabled={aprobado}
                     type="button"
                     onClick={() => handleWeekdayToggle(day.value)}
                     className={`w-10 h-10 rounded-full font-codec ${
@@ -524,6 +531,7 @@ function EventDialog({
                 {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
                   <button
                     key={day}
+                    disabled={aprobado}
                     type="button"
                     onClick={() => handleMonthDayToggle(day)}
                     className={`w-10 h-10 rounded-full font-codec ${

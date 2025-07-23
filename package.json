@@ -8,7 +8,7 @@
     "@testing-library/user-event": "^13.5.0",
     "bootstrap": "^5.3.5",
     "browser-image-compression": "^2.0.2",
-    "clase13": "file:",
+    
     "crono-mosaico": "^1.1.0",
     "date-fn": "^0.0.2",
     "date-fns": "^4.1.0",

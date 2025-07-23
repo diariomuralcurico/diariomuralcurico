@@ -12,22 +12,13 @@ import {
   addDoc,
   updateDoc,
   doc,
-  getDocs,
-  query,
-  where,
-  or,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { Timestamp } from "firebase/firestore";
 import { BarLoader } from "react-spinners";
 import "./TourModal.css";
 
-function CalendarApp({
-  user,
-  initialEvents = [],
-  className = "",
-  onEventChange,
-}) {
+function CalendarApp({ user, initialEvents = [], className = "", onEventChange }) {
   const [events, setEvents] = useState(initialEvents);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [showDialog, setShowDialog] = useState(false);
@@ -62,10 +53,10 @@ function CalendarApp({
     recurrenceDates: [],
   };
 
-  const isMobile = () => window.innerWidth <= 640;
-
   const [newEvent, setNewEvent] = useState(initialEventState);
   const [editingEvent, setEditingEvent] = useState(null);
+
+  const isMobile = () => window.innerWidth <= 640;
 
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -259,74 +250,6 @@ function CalendarApp({
     }, 300);
   };
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        let q;
-        if (user && user.uid) {
-          q = query(
-            collection(db, "menu"),
-            or(where("createdBy", "==", user.uid), where("aprobado", "==", 1)),
-          );
-        } else {
-          q = query(collection(db, "menu"), where("aprobado", "==", 1));
-        }
-        const eventsSnapshot = await getDocs(q);
-        const fetchedEvents = eventsSnapshot.docs.map((doc) => {
-          const data = doc.data();
-          const fechaInicio = data.fechaHoraActividad?.toDate();
-          const fechaFin = data.fechaHoraFinActividad?.toDate();
-          const endRecurrence = data.endRecurrenceDate?.toDate();
-
-          return {
-            createdBy: data.createdBy,
-            aprobado: data.aprobado,
-            docId: doc.id,
-            id: data.id || doc.id,
-            ...data,
-            date: fechaInicio
-              ? DateTime.fromJSDate(fechaInicio)
-                  .setZone("America/Santiago")
-                  .toISO({ suppressMilliseconds: true })
-              : null,
-            fechaFin: fechaFin
-              ? DateTime.fromJSDate(fechaFin)
-                  .setZone("America/Santiago")
-                  .toISO({ suppressMilliseconds: true })
-              : null,
-            endRecurrenceDate: endRecurrence
-              ? DateTime.fromJSDate(endRecurrence)
-                  .setZone("America/Santiago")
-                  .toISO({ suppressMilliseconds: true })
-              : null,
-            recurrenceDates: data.recurrenceDates
-              ? data.recurrenceDates.map((timestamp) =>
-                  DateTime.fromJSDate(timestamp.toDate())
-                    .setZone("America/Santiago")
-                    .toISO({ suppressMilliseconds: true }),
-                )
-              : [],
-            title: data.nombre,
-            description: data.descripcion,
-            direccion: data.direccion,
-            time: data.time || "",
-            endTime: data.endTime || "",
-            afiche: Array.isArray(data.afiche)
-              ? data.afiche
-              : [data.afiche].filter(Boolean),
-            selectedWeekdays: data.selectedWeekdays || [],
-          };
-        });
-        setEvents(fetchedEvents);
-        console.table(fetchedEvents);
-        if (onEventChange) onEventChange(fetchedEvents);
-      } catch (error) {
-        console.error("Error fetching events from Firestore:", error);
-      }
-    };
-    fetchEvents();
-  }, [user, onEventChange]);
-
   const handleAddOrUpdateEvent = async (setErrors = () => {}, selectedWeekdays = [], selectedMonthDays = []) => {
     setLoading(true);
     const newErrors = {};
@@ -421,22 +344,6 @@ function CalendarApp({
         return;
       }
     }
-
-    const addDays = (date, days) => {
-      return DateTime.fromJSDate(date)
-        .setZone("America/Santiago")
-        .plus({ days })
-        .toJSDate();
-    };
-
-    const addWeeks = (date, weeks) => addDays(date, weeks * 7);
-
-    const addMonths = (date, months) => {
-      return DateTime.fromJSDate(date)
-        .setZone("America/Santiago")
-        .plus({ months })
-        .toJSDate();
-    };
 
     let recurrenceDates = [];
     if (newEvent.recurrence !== "None") {
