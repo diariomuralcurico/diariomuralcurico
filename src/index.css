@@ -76,8 +76,6 @@
 
     /* Asegura que el contenedor del calendario sea desplazable en móviles */
     .max-w-5xl {
-        overflow-y: auto;
-        max-height: 100vh; /* Limita la altura para permitir scroll */
         -webkit-overflow-scrolling: touch; /* Mejora el scroll en iOS */
     }
 
