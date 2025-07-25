@@ -133,6 +133,16 @@ function CalendarApp({
     }
   }, [user]);
 
+  useEffect(() => {
+    if (editingEvent) {
+      setSelectedWeekdays(editingEvent.selectedWeekdays || []);
+      setSelectedMonthDays(editingEvent.selectedMonthDays || []);
+    } else {
+      setSelectedWeekdays([]);
+      setSelectedMonthDays([]);
+    }
+  }, [editingEvent]);
+
   const highlightElement = (element) => {
     if (element) {
       element.classList.add("tutorial-focus");
@@ -469,6 +479,11 @@ function CalendarApp({
                 title: updatedEvent.nombre,
                 description: updatedEvent.descripcion,
                 direccion: updatedEvent.direccion,
+                endRecurrenceDate: updatedEvent.endRecurrenceDate
+                  ? DateTime.fromJSDate(updatedEvent.endRecurrenceDate.toDate())
+                      .setZone("America/Santiago")
+                      .toISODate()
+                  : "",
                 recurrenceDates: updatedEvent.recurrenceDates.map((timestamp) =>
                   DateTime.fromJSDate(timestamp.toDate())
                     .setZone("America/Santiago")
@@ -493,6 +508,11 @@ function CalendarApp({
           title: eventBase.nombre,
           description: eventBase.descripcion,
           direccion: eventBase.direccion,
+          endRecurrenceDate: eventBase.endRecurrenceDate
+            ? DateTime.fromJSDate(eventBase.endRecurrenceDate.toDate())
+                .setZone("America/Santiago")
+                .toISODate()
+            : "",
           recurrenceDates: eventBase.recurrenceDates.map((timestamp) =>
             DateTime.fromJSDate(timestamp.toDate())
               .setZone("America/Santiago")
@@ -563,8 +583,6 @@ function CalendarApp({
         : "",
       recurrenceDates: event.recurrenceDates || [],
     });
-    setSelectedWeekdays(event.selectedWeekdays || []);
-    setSelectedMonthDays(event.selectedMonthDays || []);
     setEditingEvent({
       ...event,
       selectedWeekdays: event.selectedWeekdays || [],
@@ -636,10 +654,7 @@ function CalendarApp({
         show={showDialog}
         onClose={() => {
           setShowDialog(false);
-          const dialogCloseAnimationDuration = 300;
-          setTimeout(() => {
-            setEditingEvent(null);
-          }, dialogCloseAnimationDuration);
+          setEditingEvent(null);
         }}
         onAdd={(setErrors) =>
           handleAddOrUpdateEvent(setErrors, selectedWeekdays, selectedMonthDays)

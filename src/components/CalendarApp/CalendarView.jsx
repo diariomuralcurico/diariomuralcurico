@@ -266,6 +266,8 @@ function CalendarView({
                         }).toISODate()
                       : "",
                     recurrenceDates: event.recurrenceDates || [],
+                    selectedWeekdays: event.selectedWeekdays || [],
+                    selectedMonthDays: event.selectedMonthDays || [],
                   });
                   setShowDialog(true);
                 }}

@@ -69,6 +69,7 @@ const Reservas = () => {
               ? data.afiche
               : [data.afiche].filter(Boolean),
             selectedWeekdays: data.selectedWeekdays || [],
+            selectedMonthDays: data.selectedMonthDays || [],
           };
         });
         setEvents(fetchedEvents);
