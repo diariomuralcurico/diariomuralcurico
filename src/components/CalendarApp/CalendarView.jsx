@@ -1,4 +1,6 @@
 import React, { useRef, useState } from "react";
+import { DateTime } from "luxon";
+
 import {
   format,
   isSameDay,
@@ -259,9 +261,9 @@ function CalendarView({
                     color: event.color || "#f9a8d4",
                     recurrence: event.recurrence || "None",
                     endRecurrenceDate: event.endRecurrenceDate
-                      ? typeof event.endRecurrenceDate === "string"
-                        ? event.endRecurrenceDate
-                        : event.endRecurrenceDate.toDate().toISOString()
+                      ? DateTime.fromISO(event.endRecurrenceDate, {
+                          zone: "America/Santiago",
+                        }).toISODate()
                       : "",
                     recurrenceDates: event.recurrenceDates || [],
                   });
