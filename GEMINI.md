@@ -86,4 +86,22 @@ Para asegurar una interacción adecuada con el proyecto, utilice los siguientes 
 
 Este enfoque asegura la mejor experiencia de usuario posible al guiarlo para que complete el inicio de sesión en un entorno compatible.
 
+## 8. Cambios Recientes
+
+### Levantamiento de Estado en `EventDialog`
+
+Para asegurar que los estados `selectedWeekdays` y `selectedMonthDays` persistan entre las instancias del componente `EventDialog`, se ha refactorizado la gestión de estos estados.
+
+*   **`src/components/CalendarApp/EventDialog.jsx`**:
+    *   Se eliminó la declaración interna de `useState` y el `useEffect` asociado para `selectedWeekdays` y `selectedMonthDays`.
+    *   Estos estados ahora se reciben como `props` (`selectedWeekdays`, `setSelectedWeekdays`, `selectedMonthDays`, `setSelectedMonthDays`).
+    *   Se actualizaron los `propTypes` para reflejar estos nuevos `props`.
+
+*   **`src/components/CalendarApp/CalendarApp.jsx` (Componente Padre)**:
+    *   Se declararon los estados `selectedWeekdays` y `selectedMonthDays` utilizando `useState`.
+    *   Se modificó la instancia de `EventDialog` para pasar estos estados y sus funciones `setter` como `props`.
+    *   Se ajustaron las funciones `handleEditEvent` y `handleDayClick` para inicializar o actualizar `selectedWeekdays` y `selectedMonthDays` según sea necesario.
+
+Este cambio centraliza la gestión del estado de los días seleccionados en el componente padre, `CalendarApp`, garantizando la persistencia y coherencia de los datos.
+
 Este archivo `GEMINI.md` debería servir como una referencia rápida para comprender la configuración del proyecto y cómo interactuar con él.

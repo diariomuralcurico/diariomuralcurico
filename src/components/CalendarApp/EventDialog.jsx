@@ -12,30 +12,15 @@ function EventDialog({
   selectedDate,
   showTimeField,
   isEditing,
-  initialSelectedWeekdays = [],
-  initialSelectedMonthDays = [],
+  selectedWeekdays,
+  setSelectedWeekdays,
+  selectedMonthDays,
+  setSelectedMonthDays,
 }) {
   useEscapeKey(show, onClose);
   const [errors, setErrors] = useState({});
   const [phoneValid, setPhoneValid] = useState(null); // Estado para validación en tiempo real del teléfono
-  const [selectedWeekdays, setSelectedWeekdays] = useState(
-    initialSelectedWeekdays,
-  );
-  const [selectedMonthDays, setSelectedMonthDays] = useState(
-    initialSelectedMonthDays,
-  );
-
-  useEffect(() => {
-    if (show) {
-      setSelectedWeekdays(initialSelectedWeekdays || []);
-      setSelectedMonthDays(initialSelectedMonthDays || []);
-    } else {
-      setErrors({});
-      setPhoneValid(null);
-      setSelectedWeekdays([]);
-      setSelectedMonthDays([]);
-    }
-  }, [show, initialSelectedWeekdays, initialSelectedMonthDays]);
+  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -851,6 +836,10 @@ EventDialog.propTypes = {
   selectedDate: PropTypes.instanceOf(Date),
   showTimeField: PropTypes.bool,
   isEditing: PropTypes.bool,
+  selectedWeekdays: PropTypes.arrayOf(PropTypes.number).isRequired,
+  setSelectedWeekdays: PropTypes.func.isRequired,
+  selectedMonthDays: PropTypes.arrayOf(PropTypes.number).isRequired,
+  setSelectedMonthDays: PropTypes.func.isRequired,
 };
 
 export default EventDialog;

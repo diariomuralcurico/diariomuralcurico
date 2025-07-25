@@ -28,6 +28,8 @@ function CalendarApp({
   const [showTour, setShowTour] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedDateForHours, setSelectedDateForHours] = useState(null);
+  const [selectedWeekdays, setSelectedWeekdays] = useState([]);
+  const [selectedMonthDays, setSelectedMonthDays] = useState([]);
   const calendarRef = useRef(null);
 
   const initialEventState = {
@@ -560,9 +562,9 @@ function CalendarApp({
           }).toISODate()
         : "",
       recurrenceDates: event.recurrenceDates || [],
-      selectedWeekdays: event.selectedWeekdays || [],
-      selectedMonthDays: event.selectedMonthDays || [],
     });
+    setSelectedWeekdays(event.selectedWeekdays || []);
+    setSelectedMonthDays(event.selectedMonthDays || []);
     setEditingEvent({
       ...event,
       selectedWeekdays: event.selectedWeekdays || [],
@@ -581,6 +583,8 @@ function CalendarApp({
       date: dateStr,
       fechaFin: dateStr,
     });
+    setSelectedWeekdays([]);
+    setSelectedMonthDays([]);
     setShowDialog(true);
   };
 
@@ -637,7 +641,7 @@ function CalendarApp({
             setEditingEvent(null);
           }, dialogCloseAnimationDuration);
         }}
-        onAdd={(setErrors, selectedWeekdays, selectedMonthDays) =>
+        onAdd={(setErrors) =>
           handleAddOrUpdateEvent(setErrors, selectedWeekdays, selectedMonthDays)
         }
         newEvent={newEvent}
@@ -645,12 +649,10 @@ function CalendarApp({
         selectedDate={selectedDay ? new Date(selectedDay) : null}
         showTimeField={true}
         isEditing={!!editingEvent}
-        initialSelectedWeekdays={
-          editingEvent ? editingEvent.selectedWeekdays : []
-        }
-        initialSelectedMonthDays={
-          editingEvent ? editingEvent.selectedMonthDays : []
-        }
+        selectedWeekdays={selectedWeekdays}
+        setSelectedWeekdays={setSelectedWeekdays}
+        selectedMonthDays={selectedMonthDays}
+        setSelectedMonthDays={setSelectedMonthDays}
       />
       {showTour && (
         <TourModal
