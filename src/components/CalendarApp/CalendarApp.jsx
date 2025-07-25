@@ -433,9 +433,9 @@ function CalendarApp({
         color: newEvent.color,
         recurrence: newEvent.recurrence,
         endRecurrenceDate: newEvent.endRecurrenceDate
-          ? DateTime.fromISO(newEvent.endRecurrenceDate, {
+          ? Timestamp.fromDate(DateTime.fromISO(newEvent.endRecurrenceDate, {
               zone: "America/Santiago",
-            }).toISODate()
+            }).toJSDate())
           : "",
         recurrenceDates: recurrenceDates.map(({ start }) =>
           Timestamp.fromDate(start),

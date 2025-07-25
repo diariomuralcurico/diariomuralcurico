@@ -53,11 +53,12 @@ const Reservas = () => {
                   .toISO({ suppressMilliseconds: true })
               : null,
             recurrenceDates: data.recurrenceDates
-              ? data.recurrenceDates.map((timestamp) =>
-                  DateTime.fromJSDate(timestamp.toDate())
+              ? data.recurrenceDates.map((timestamp) => {
+                  const date = typeof timestamp.toDate === 'function' ? timestamp.toDate() : timestamp;
+                  return DateTime.fromJSDate(date)
                     .setZone("America/Santiago")
-                    .toISO({ suppressMilliseconds: true })
-                )
+                    .toISO({ suppressMilliseconds: true });
+                })
               : [],
             title: data.nombre,
             description: data.descripcion,
