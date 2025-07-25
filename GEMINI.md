@@ -73,4 +73,17 @@ Para asegurar una interacción adecuada con el proyecto, utilice los siguientes 
 *   **Storage**: El contenido subido por el usuario (por ejemplo, imágenes) se almacena en Firebase Storage. Consulte `storage.rules` para las reglas de seguridad.
 *   **Exportaciones de Datos**: Los directorios `firebase-export-*` contienen datos exportados. Al trabajar con datos, considere si estas exportaciones son relevantes para las pruebas locales o la migración de datos.
 
+## 7. Manejo de WebView en Autenticación
+
+*   **Problema**: Google bloquea los inicios de sesión de OAuth desde WebViews incrustadas (ej. navegadores de Instagram, Facebook) por seguridad. Esto impide que el flujo de "Iniciar Sesión con Google" se complete.
+*   **Solución**: Se implementó una estrategia de detección y escape de WebViews en el componente `Login`.
+    1.  **Detección**: El componente detecta si se está ejecutando dentro de una WebView buscando palabras clave específicas en el `User Agent`.
+    2.  **Vista Personalizada**: Si se detecta una WebView, se muestra una vista especial que instruye al usuario a continuar en un navegador externo.
+    3.  **Lógica de Escape por Plataforma**:
+        *   **Android**: Se utiliza un `intent` de Android (`intent://...`) para solicitar explícitamente al sistema operativo que abra la URL en Chrome. Este es el método más fiable para esta plataforma.
+        *   **iOS**: Se emplea una técnica de "clic dinámico". Un botón crea un elemento `<a>` en el DOM, simula un clic en él y lo elimina. Este método tiene una alta probabilidad de ser interpretado por iOS como una acción legítima para abrir Safari.
+        *   **Fallback**: Para otros dispositivos, se usa un `target="_blank"` como solución genérica.
+
+Este enfoque asegura la mejor experiencia de usuario posible al guiarlo para que complete el inicio de sesión en un entorno compatible.
+
 Este archivo `GEMINI.md` debería servir como una referencia rápida para comprender la configuración del proyecto y cómo interactuar con él.

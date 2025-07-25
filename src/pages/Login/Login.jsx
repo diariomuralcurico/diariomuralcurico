@@ -1,36 +1,51 @@
-import React, { useState } from "react";
-import { Button, Form, Alert, Card } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Button, Alert, Card } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import { auth, googleProvider } from "../../config/Firebase";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { signInWithPopup } from "firebase/auth";
 import { useAuth } from "../../components/AuthContext";
 import "./Login.css";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [isWebView, setIsWebView] = useState(false);
 
-  // Redirect if already logged in
-  if (user) {
-    navigate("/publicar");
-  }
+  // --- Para Pruebas ---
+  // Cambia a `true` para forzar la vista de WebView en un navegador normal.
+  const forceWebViewForTesting = false;
 
-  const handleEmailLogin = async (e) => {
-    e.preventDefault();
-    setError("");
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate("/publicar");
-    } catch (err) {
-      setError("Correo o contraseña incorrectos. Por favor, intenta de nuevo.");
-      console.error("Error en inicio de sesión:", err);
+  useEffect(() => {
+    if (forceWebViewForTesting) {
+      setIsWebView(true);
+      return;
     }
-  };
+    const userAgent = navigator.userAgent.toLowerCase();
+    const webViewKeywords = [
+      "wv",
+      "webview",
+      "fbav",
+      "instagram",
+      "fban",
+      "fbdv",
+      "fbss",
+    ];
+    setIsWebView(
+      webViewKeywords.some((keyword) => userAgent.includes(keyword)),
+    );
+  }, [forceWebViewForTesting]);
+
+  useEffect(() => {
+    if (user) {
+      navigate("/publicar");
+    }
+  }, [user, navigate]);
 
   const handleGoogleLogin = async () => {
+    if (isWebView) {
+      return; // No-op in WebView, the dedicated view handles it.
+    }
     setError("");
     try {
       await signInWithPopup(auth, googleProvider);
@@ -42,6 +57,57 @@ const Login = () => {
       console.error("Error en inicio de sesión con Google:", err);
     }
   };
+
+  const openInBrowser = () => {
+    const url = window.location.href;
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isAndroid = /android/.test(userAgent);
+    const isIOS = /iphone|ipad|ipod/.test(userAgent);
+
+    if (isAndroid) {
+      const intentUrl = url.replace(/^(https?:\/\/)/, "");
+      window.location.href = `intent://${intentUrl}#Intent;scheme=https;package=com.android.chrome;end`;
+    } else if (isIOS) {
+      const a = document.createElement("a");
+      a.href = url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else {
+      window.open(url, "_blank"); // Generic fallback
+    }
+  };
+
+  if (isWebView) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-white shadow-lg rounded-lg overflow-hidden">
+          <Card.Body className="p-6 text-center">
+            <img
+              src="/images/lgdmcfull2.png"
+              alt="Logo Diario Mural Curicó"
+              className="mx-auto h-16 mb-4"
+            />
+            <h2 className="text-2xl font-bold text-gray-800 font-codec mb-3">
+              Abre en tu Navegador
+            </h2>
+            <p className="text-gray-600 font-codec mb-4">
+              Para iniciar sesión de forma segura, por favor continúa en el
+              navegador de tu teléfono (Chrome, Safari, etc.).
+            </p>
+            <Button
+              onClick={openInBrowser}
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-codec py-2 px-4 rounded-md transition-colors duration-200"
+            >
+              Abrir en el navegador para continuar
+            </Button>
+          </Card.Body>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
@@ -67,53 +133,6 @@ const Login = () => {
             </Alert>
           )}
 
-          {/* <Form onSubmit={handleEmailLogin}>
-            <Form.Group className="mb-4">
-              <div className="relative">
-                <Form.Control
-                  type="email"
-                  placeholder=" "
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="peer font-codec border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                  required
-                />
-                <Form.Label className="absolute top-3 left-3 text-gray-500 transition-all duration-200 peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-focus:-top-6 peer-focus:text-sm peer-focus:text-indigo-600 font-codec">
-                  Correo Electrónico
-                </Form.Label>
-              </div>
-            </Form.Group>
-
-            <Form.Group className="mb-4">
-              <div className="relative">
-                <Form.Control
-                  type="password"
-                  placeholder=" "
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="peer font-codec border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                  required
-                />
-                <Form.Label className="absolute top-3 left-3 text-gray-500 transition-all duration-200 peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-focus:-top-6 peer-focus:text-sm peer-focus:text-indigo-600 font-codec">
-                  Contraseña
-                </Form.Label>
-              </div>
-            </Form.Group>
-
-            <Button
-              type="submit"
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-codec py-2 rounded-md transition-colors duration-200"
-            >
-              Iniciar Sesión
-            </Button>
-          </Form> */}
-
-          {/* <div className="flex items-center my-4">
-            <hr className="flex-grow border-gray-300" />
-            <span className="mx-2 text-gray-500 font-codec">o</span>
-            <hr className="flex-grow border-gray-300" />
-          </div> */}
-
           <Button
             variant="outline-dark"
             onClick={handleGoogleLogin}
@@ -126,13 +145,6 @@ const Login = () => {
             />
             Iniciar con Google
           </Button>
-
-          {/* <p className="text-center mt-4 text-gray-600 font-codec">
-            ¿No tienes una cuenta?{" "}
-            <Link to="/register" className="text-indigo-600 hover:underline">
-              Regístrate
-            </Link>
-          </p> */}
         </Card.Body>
       </Card>
     </div>
